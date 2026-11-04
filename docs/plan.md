@@ -132,3 +132,4 @@ README in the style of Long Exposure's (what you get, getting your orders, your 
 ## Build checklist
 
 - [x] Step 0: scaffold, dependencies, shadcn components and running dev server
+- [x] Step 1: generated tokens, semantic theme mapping and fonts
