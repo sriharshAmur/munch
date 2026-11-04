@@ -18,7 +18,7 @@ These rules are absolute. If a task seems to need breaking one, stop and ask.
 - **The session never touches disk.** The CLI reads the copied cURL from the clipboard (`pbpaste`), keeps the bearer token and cookies in memory for the run, and forgets them. They are never written to a file, a log, an error message, a test fixture or a commit. Errors print the URL path and status, never headers. When the session has expired (401 or 403), the CLI stops and says: copy a fresh cURL and run it again.
 - **Be polite to the site.** One request at a time, at least 750ms apart, with jitter. On 429 or 503, wait (honour `Retry-After`, otherwise back off exponentially from 30 seconds) and give up after five tries. No parallel requests, ever.
 - **Use only what the public website does.** Sri works at Just Eat Takeaway, which owns Thuisbezorgd. The fetcher may call only what the customer website itself calls in the browser, as seen in DevTools. No internal knowledge, code, documentation or endpoints. Agents do not search for or use anything beyond what Sri's own browser shows.
-- **Never describe the Thuisbezorgd API in anything published.** No endpoint paths, parameters or response structures in the README, DESIGN.md, docs, commit messages, issues or screenshots. The adapter code is the only place they live, and whether it ships in the public repository is an open item for Sri (see below).
+- **Never describe the Thuisbezorgd API in anything published.** No endpoint paths, parameters or response structures in the README, DESIGN.md, docs, commit messages, issues or screenshots. The adapter code is the only place they live. Sri decided the adapter ships in the public repository.
 - **Agents never read real order data.** Nothing under `data/` goes into an agent's context: not raw responses, not `orders.json`. To design a parser, an agent reads the redacted shape files in `shapes/` that `munch probe` writes (keys, types and array lengths, every value replaced). To check a parser against real data, an agent runs `munch check`, which prints only counts and problems, never values.
 - **Nothing private in the repository.** `data/`, `shapes/`, `.env` and any export are ignored by git from the first commit. Tests, fixtures, screenshots and examples use the demo person only. Before each commit, check `git status` and the diff for anything that looks like a real name, address, restaurant, order or token.
 - **The GDPR data download is the fallback.** If the website's own calls turn out to be fragile, say so, and build an importer for the account data export instead.
@@ -33,7 +33,8 @@ These rules are absolute. If a task seems to need breaking one, stop and ask.
 | Shared core | Plain TypeScript in `core/`: the order schema (zod), the analysis and the predictions. No Bun, Node or DOM APIs, so it runs in the CLI, the tests and the browser |
 | Web | Vite, React 19, TanStack Router (search params for filters), TanStack Table |
 | Design system | shadcn/ui (Radix), Tailwind CSS 4, lucide icons, styled with `design/tokens.json` |
-| Charts | Hand-built SVG components with d3-scale, d3-shape, d3-array and d3-time for maths only |
+| Charts | Small hand-built HTML and SVG charts (`web/src/charts/`, `web/src/home/`); d3-scale, d3-shape, d3-array and d3-time for maths only |
+| Motion | Motion (motion.dev) for the stories, springs and count-ups; CSS transitions for bars growing in and everything small |
 | Fonts | Bricolage Grotesque and Source Serif 4 through Fontsource, self-hosted |
 | Tests | `bun test` for the core and the CLI's parsing |
 | Storage | `data/raw/thuisbezorgd/` holds raw responses as fetched; `data/orders.json` is the normalised output (decision 0001) |
@@ -52,11 +53,13 @@ core/
   analyze/           pure functions from Order[] to each chapter's figures
   predict.ts         the next-order prediction and its backtest
 demo/
-  generate.ts        a seeded, made-up person with several homes and years of orders
+  generate.ts        a seeded, made-up person with a year of orders and two homes
 web/                 the Vite app
-  src/charts/        the hand-built charts
+  src/home/          the home page: story rings and their player, the headline, the question cards
+  src/story/         sections under the cards: the order type, tickets, the guess
+  src/charts/        bars, tooltips and other small chart pieces
   src/components/ui/ shadcn components (written by the shadcn CLI)
-  src/routes/        TanStack Router routes: /, /orders, /places, /start
+  src/routes/        TanStack Router routes: /orders, /places, /start, and their shared parts
 design/tokens.json   every design value
 docs/decisions/      short notes on judgement calls
 docs/screenshots/    demo-data screenshots for the README
@@ -88,7 +91,7 @@ Raw responses keep everything the site returned; the normaliser keeps only what 
 - Money is whole cents. Times are stored as ISO strings with their offset and analysed in Europe/Amsterdam.
 - Fetching is incremental. A run walks the history pages newest first and stops when it reaches an order already in `data/raw`; detail is fetched only for orders without a stored detail. `munch fetch --full` refetches everything.
 - Raw before normalised. The fetcher only saves raw responses; `munch build` turns them into `orders.json`, so a parser fix never needs a refetch.
-- The demo person is generated from a fixed seed, so the demo, the tests and the screenshots are stable. The generator models real habits (weekday rhythm, favourites that change with each home, group orders on weekends, a lockdown spike), so every chapter has something to say.
+- The demo person is generated from a fixed seed, so the demo, the tests and the screenshots are stable. Thuisbezorgd keeps about a year of orders, so the demo is one year too. The generator models real habits (weekday rhythm, favourites that change with a move, group orders on weekends, a dropped favourite, a Sunday ritual), so every card and ticket has something to say.
 - Every analysis function has a behaviour test on the demo data or on a small hand-written list of fake orders.
 - Charts follow DESIGN.md. Colours come from tokens, never hex values in components.
 - Copy follows the voice in DESIGN.md.
@@ -101,22 +104,22 @@ bun run dev            # the web app at http://localhost:5173, using data/orders
 bun run munch probe    # run the copied cURL once and write its redacted shape to shapes/
 bun run munch fetch    # fetch your history into data/raw/ (incremental)
 bun run munch build    # normalise data/raw/ into data/orders.json
-bun run munch check    # counts and problems in data/orders.json, no values
+bun run munch check    # counts and problems in data/orders.json, no values (--coverage: which fields are filled)
 bun run munch demo     # regenerate the demo person
 bun test
 bun run typecheck
-bun run build          # static site with the demo data, for the public page
+bun run build          # static site with the demo data
+bun run deploy         # build under /munch/ and deploy to sriharsh.com/munch
 ```
 
 ## Working on the repository
 
 - Commit in small, reviewable steps with plain messages that say what changed and why.
-- There is no GitHub remote yet. Do not create one or push until Sri says so.
+- The repository is public at github.com/sriharshAmur/munch. The site is deployed with `bun run deploy` to sriharsh.com/munch (the demo only).
 - Never mention an AI assistant in commits, pull requests or docs.
 - When something changes what people see, take screenshots with the demo data at 375px and 1440px in light and dark, and keep the README's screenshots current under `docs/screenshots/`.
-- Before saying something works, run it: the CLI against the demo or a probe, the page in a browser.
+- Before saying something works, run it: the CLI against the demo or a probe, the page in a browser. Agents run the app with `MUNCH_DEMO_ONLY=1`, which refuses the local orders file, and take screenshots with `scripts/screenshots.ts`.
 
 ## Open items
 
-- Whether the Thuisbezorgd adapter ships in the public repository, given Sri's employer. Until Sri decides, keep endpoint details out of everything except `cli/sources/thuisbezorgd/`, and review it before the repository is made public.
 - An importer for the GDPR data download, if the website's own calls turn out to be fragile.
