@@ -83,7 +83,7 @@ Charts are hand-built SVG components in `web/src/charts/`, with d3 for scales, s
 | New or familiar | Share of each year's orders at a restaurant you had never ordered from, as one line | The explore-or-stick habit |
 | Company | Tall segmented bar for solo vs group; group orders on the week heatmap's grid as dots | Plus basket size side by side as two numbers |
 | Streaks and gaps | Calendar: one square per day, a row of weeks per year, amber when you ordered | Longest streak and longest gap outlined and labelled |
-| Homes | One panel per home: dates, orders a week, top restaurant and cuisine, typical slot | Homes are called "Home 1, 2, 3" until you name them in the browser |
+| Homes | One panel per home: dates, orders a week, top restaurant and cuisine, typical slot | Private local street-and-number labels when available; otherwise "Home 1, 2, 3". All names can be edited in the browser. Demo streets are fictional. |
 | The cost | Tiles for food, delivery fees, service fees, tips, discounts; average order value per year as a line | No judgement in the words |
 | Next order | A sentence with the predicted day, time window and restaurant, three runner-up restaurants as a small ranked list, and the hit rate on your past orders | "Right 4 times out of 10 on your last 100 orders" |
 
@@ -178,7 +178,7 @@ Written content is part of the design. Write like a friend who looked at your da
 | dish | item, product, SKU | "Items" only in the order sheet's line list |
 | group order | shared order, party order | The opposite is "on your own" |
 | delivery, pickup | fulfilment method | |
-| home | address, location | A delivery area. The page never shows a street address |
+| home | address, location | A doorstep. Private local labels may show the street and number at Sri's request; the order export keeps only the coarse area. |
 | spend | revenue, cost | What you paid, fees included |
 | your usual | favourite, top item | The dish you order most at a restaurant |
 

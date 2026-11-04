@@ -1,4 +1,5 @@
 import { scaleBand, scaleLinear } from 'd3-scale';
+import { useHomeName } from '@/data/provider';
 import { timeline } from '@core/analyze/timeline';
 import type { Order } from '@core/schema';
 import { euros, month, plural } from '@/lib/format';
@@ -96,7 +97,8 @@ function Monthly({
   );
 }
 export function TimelineChapter({ orders }: { orders: Order[] }) {
-  const t = timeline(orders),
+  const homeName = useHomeName(),
+    t = timeline(orders),
     peak = t.busiest;
   return (
     <Chapter
@@ -127,7 +129,7 @@ export function TimelineChapter({ orders }: { orders: Order[] }) {
         <div className="home-bands">
           {t.homes.map((h) => (
             <span key={h.key}>
-              Home {h.key} · {h.city}
+              {homeName(h.key)} · {h.city}
             </span>
           ))}
         </div>

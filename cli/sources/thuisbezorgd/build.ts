@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { existsSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { mkdir, rename } from 'node:fs/promises';
+import { privateHome } from './home';
+import { HomeLabelsSchema } from '../../../core/home-labels';
 import { normalizeDetail } from './normalize';
 import { OrdersFileSchema, type Order } from '../../../core/schema';
 
@@ -42,11 +44,14 @@ export async function build({
   if (!paths.length)
     throw Error('No stored orders yet. Run munch fetch first.');
   const orders: Order[] = [];
+  const labels = new Map<string, string>();
   const problems = new Map<string, number>();
   for (const path of paths) {
     try {
       const input: unknown = await Bun.file(path).json();
-      orders.push(normalizeDetail(input));
+      const home = privateHome(input);
+      orders.push(normalizeDetail(input, home.key));
+      if (home.label) labels.set(home.key, home.label);
     } catch (error) {
       const message =
         error instanceof Error
@@ -66,16 +71,6 @@ export async function build({
   const unique = [...new Map(orders.map((o) => [o.id, o])).values()].sort(
     (a, b) => Date.parse(a.placedAt) - Date.parse(b.placedAt),
   );
-  const homeKeys = new Map<string, string>();
-  for (const order of unique) {
-    const area = `${order.home.postcode}:${order.home.city.toLocaleLowerCase('nl-NL')}`;
-    let key = homeKeys.get(area);
-    if (!key) {
-      key = String(homeKeys.size + 1);
-      homeKeys.set(area, key);
-    }
-    order.home.key = key;
-  }
   const file = OrdersFileSchema.parse({
     version: 1,
     source: 'thuisbezorgd',
@@ -83,6 +78,21 @@ export async function build({
     orders: unique,
   });
   await mkdir(dirname(output), { recursive: true });
+  const names = Object.fromEntries(
+    [...new Set(unique.map((o) => o.home.key))].flatMap((key) => {
+      const label = labels.get(key);
+      return label ? [[key, label]] : [];
+    }),
+  );
+  const metadata = HomeLabelsSchema.parse({
+    version: 1,
+    source: file.source,
+    ordersGeneratedAt: file.generatedAt,
+    names,
+  });
+  const namesPath = `${dirname(output)}/home-labels.json`;
+  await Bun.write(`${namesPath}.next`, JSON.stringify(metadata));
+  await rename(`${namesPath}.next`, namesPath);
   await Bun.write(`${output}.next`, JSON.stringify(file));
   await rename(`${output}.next`, output);
   process.stdout.write(`Built ${unique.length} orders.\n`);

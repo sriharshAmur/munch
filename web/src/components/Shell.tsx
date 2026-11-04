@@ -20,12 +20,13 @@ import {
 } from './ui/dropdown-menu';
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
 import { Badge } from './ui/badge';
-import { useData } from '@/data/provider';
+import { useData, useHomeName } from '@/data/provider';
 import { useFilters } from '@/lib/search';
 import { availableHomes, availableYears } from '@core/analyze/filter';
 import { date } from '@/lib/format';
 import { PlateMark } from './PlateMark';
 export function Shell() {
+  const homeName = useHomeName();
   const { state, loadDemo, openFile, forget } = useData(),
     filters = useFilters(),
     navigate = useNavigate(),
@@ -102,7 +103,7 @@ export function Shell() {
                 <SelectLabel>Homes</SelectLabel>
                 {availableHomes(orders).map((h) => (
                   <SelectItem key={h.key} value={`home:${h.key}`}>
-                    Home {h.key} · {h.city}
+                    {homeName(h.key)} · {h.city}
                   </SelectItem>
                 ))}
               </SelectGroup>

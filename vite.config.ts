@@ -20,6 +20,17 @@ export default defineConfig({
             server.ws.send({ type: 'custom', event: 'munch:local-updated' });
         };
         server.watcher.on('change', notify).on('add', notify);
+        server.middlewares.use('/local/homes.json', (_req, res) => {
+          const file = resolve(root, 'data/home-labels.json');
+          if (!existsSync(file)) {
+            res.statusCode = 404;
+            res.end();
+            return;
+          }
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Cache-Control', 'no-store');
+          createReadStream(file).pipe(res);
+        });
         server.middlewares.use('/local/orders.json', (_req, res) => {
           const file = resolve(root, 'data/orders.json');
           if (!existsSync(file)) {

@@ -125,7 +125,7 @@ export async function fetchHistory({
   process.stdout.write(
     stoppedAtKnown
       ? `Incremental fetch stopped at an existing order. Saved ${saved} new orders.\n`
-      : `Reached the end of history. Saved ${saved} orders from ${pages} pages.\n`,
+      : `Reached the end of the returned listing. Saved ${saved} orders from ${pages} pages. Older orders may exist outside this listing.\n`,
   );
   return { saved, pages, stoppedAtKnown };
 }

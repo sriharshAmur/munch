@@ -46,3 +46,42 @@ test('keeps an owned captured order missing from history and deduplicates repeat
     await rm(root, { recursive: true, force: true });
   }
 });
+test('keeps street labels in a private sidecar and separates houses within one postcode', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'munch-homes-'));
+  try {
+    await mkdir(join(root, 'orders'));
+    for (const [id, street] of [
+      ['first', 'Imaginary Lane 12'],
+      ['second', 'Imaginary Lane 14'],
+    ]) {
+      await Bun.write(
+        join(root, `orders/${id}.json`),
+        JSON.stringify({
+          ...fakeDetail,
+          id,
+          consumer: {
+            ...fakeDetail.consumer,
+            deliveryAddress: {
+              ...fakeDetail.consumer.deliveryAddress,
+              addressLines: [street],
+            },
+          },
+        }),
+      );
+    }
+    const output = join(root, 'built.json');
+    await build({ rawRoot: root, output });
+    const text = await Bun.file(output).text(),
+      file = OrdersFileSchema.parse(JSON.parse(text));
+    expect(new Set(file.orders.map((o) => o.home.key)).size).toBe(2);
+    expect(text).not.toContain('Imaginary Lane');
+    const labels = await Bun.file(join(root, 'home-labels.json')).json();
+    expect(Object.values(labels.names).sort()).toEqual([
+      'Imaginary Lane 12',
+      'Imaginary Lane 14',
+    ]);
+    expect(labels.ordersGeneratedAt).toBe(file.generatedAt);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
