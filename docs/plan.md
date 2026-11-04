@@ -146,3 +146,4 @@ Sri asked to show his local import and provide `orders.json` before continuing t
 - [x] Step 5.4: ranked regulars and every-visit lifetime strips
 - [x] Step 5.5: ranked dishes and stable cuisine shares
 - [x] Step 5.6: company, basket sizes and shared-order rhythm
+- [x] Step 5.7: calendar, longest streak and longest pause
