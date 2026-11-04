@@ -128,3 +128,7 @@ From the shape files only: walk every page of the history from the newest, save 
 ## Step 9: public polish
 
 README in the style of Long Exposure's (what you get, getting your orders, your data stays yours, run it yourself, how it works), screenshots of the demo person under `docs/screenshots/`, an MIT licence, and a static build of the demo. Do not create a GitHub remote until Sri says so.
+
+## Build checklist
+
+- [x] Step 0: scaffold, dependencies, shadcn components and running dev server
