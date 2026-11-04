@@ -1,0 +1,29 @@
+# Private: your orders, raw responses and probe output never leave this machine
+data/
+shapes/
+exports/
+*.export.json
+*.har
+*.curl
+*.db
+*.db-*
+*.sqlite
+*.zip
+*.csv
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Build and tooling
+node_modules/
+dist/
+web/dist/
+.vite/
+*.tsbuildinfo
+coverage/
+.DS_Store
+
+# Personal notes
+*.private.md
