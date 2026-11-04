@@ -1,5 +1,45 @@
-import {test,expect} from 'bun:test';
-import {parseCurl,redactedSummary} from './curl';
-import {shape,responseShape} from './shape';
-test('parses browser quoting without running shell code',()=>{const r=parseCurl("curl 'https://example.com/own-orders' \\\n -H 'authorization: Bearer pretend-only' -b $'one=a; two=b' --compressed");expect(r.method).toBe('GET');expect(redactedSummary(r)).toBe('bearer token, 2 cookies');expect(redactedSummary(r)).not.toContain('pretend-only');expect(parseCurl("curl https://example.com -d '{\"x\":1}'").method).toBe('POST');expect(()=>parseCurl("curl 'unfinished")).toThrow();});
-test('redacts every value and merges heterogeneous array keys',()=>{expect(shape({name:'Pretend Person',rows:[{a:'x'},{b:123}],when:'2026-01-01T00:00:00Z'})).toEqual({name:'<str>',rows:{$length:2,$items:{a:'<str>',b:0}},when:'<date>'});expect(responseShape('<script type="application/json">{"private":"fake"}</script>','text/html')).toEqual({kind:'server-rendered',scripts:[{private:'<str>'}]});});
+import { test, expect } from 'bun:test';
+import { parseCurl, redactedSummary } from './curl';
+import { shape, responseShape } from './shape';
+test('parses browser quoting without running shell code', () => {
+  const r = parseCurl(
+    "curl 'https://example.com/own-orders' \\\n -H 'authorization: Bearer pretend-only' -b $'one=a; two=b' --compressed",
+  );
+  expect(r.method).toBe('GET');
+  expect(redactedSummary(r)).toBe('bearer token, 2 cookies');
+  expect(redactedSummary(r)).not.toContain('pretend-only');
+  expect(parseCurl('curl https://example.com -d \'{"x":1}\'').method).toBe(
+    'POST',
+  );
+  expect(() => parseCurl("curl 'unfinished")).toThrow();
+});
+test('redacts every value and merges heterogeneous array keys', () => {
+  expect(
+    shape({
+      name: 'Pretend Person',
+      rows: [{ a: 'x' }, { b: 123 }],
+      when: '2026-01-01T00:00:00Z',
+    }),
+  ).toEqual({
+    name: '<str>',
+    rows: { $length: 2, $items: { a: '<str>', b: 0 } },
+    when: '<date>',
+  });
+  expect(
+    responseShape(
+      '<script type="application/json">{"private":"fake"}</script>',
+      'text/html',
+    ),
+  ).toEqual({ kind: 'server-rendered', scripts: [{ private: '<str>' }] });
+});
+test('merged shapes preserve null variants and nonempty nested arrays', () => {
+  const result = shape([
+    { group: null, options: [] },
+    { group: { size: 3 }, options: [{ name: 'Made up' }] },
+  ]);
+  const text = JSON.stringify(result);
+  expect(text).not.toContain('Made up');
+  expect(text).toContain('$variants');
+  expect(text).toContain('"$length":1');
+  expect(text).toContain('"name":"<str>"');
+});

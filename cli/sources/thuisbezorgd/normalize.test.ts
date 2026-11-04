@@ -1,5 +1,70 @@
-import {test,expect} from 'bun:test';
-import {normalizeDetail} from './normalize';
-const fake={id:'made-up-order',information:{createdAt:'2026-03-01T22:30:00Z',isForDelivery:true},basket:{currencyCode:'EUR',groupSummary:null,summary:{items:[{name:'Imaginary noodles',quantity:2,price:24,unitPrice:12}]}},consumer:{name:'Not retained',email:'nobody@example.invalid',deliveryAddress:{city:'Demo city',postalCode:'0001 ZZ',addressLines:['Not retained']}},payment:{totals:{subtotal:24,fees:2,discounts:0,tips:1,vouchers:0,accountCredits:0,complimentary:0,totalToPay:27,totalPaid:27},fees:{delivery:1.5,serviceCharge:.5},payments:[{displayName:'Demo payment',value:27}]},restaurant:{id:'fake-place',displayName:'Imaginary Noodle Attic',cuisines:[{name:'Thai',rank:1}]},status:{value:'delivered',finishedAt:null}};
-test('normalisation converts euros to cents and keeps only the coarse delivery area',()=>{const o=normalizeDetail(fake);expect(o.money.total).toBe(2700);expect(o.items[0]?.total).toBe(2400);expect(o.placedAt).toBe('2026-03-01T23:30:00+01:00');expect(o.home).toEqual({key:'1',postcode:'0001',city:'Demo city'});expect(JSON.stringify(o)).not.toContain('Not retained');expect(JSON.stringify(o)).not.toContain('example.invalid');});
-test('a changed response reports field paths without values',()=>{expect(()=>normalizeDetail({...fake,restaurant:{id:123,displayName:'Secret pretend name'}})).toThrow('restaurant.id');try{normalizeDetail({...fake,restaurant:{id:123,displayName:'Secret pretend name'}});}catch(e){expect(String(e)).not.toContain('Secret pretend name');}});
+import { test, expect } from 'bun:test';
+import { normalizeDetail } from './normalize';
+const fake = {
+  id: 'made-up-order',
+  information: { createdAt: '2026-03-01T22:30:00Z', isForDelivery: true },
+  basket: {
+    currencyCode: 'EUR',
+    groupSummary: null,
+    summary: {
+      items: [
+        { name: 'Imaginary noodles', quantity: 2, price: 24, unitPrice: 12 },
+      ],
+    },
+  },
+  consumer: {
+    name: 'Not retained',
+    email: 'nobody@example.invalid',
+    deliveryAddress: {
+      city: 'Demo city',
+      postalCode: '0001 ZZ',
+      addressLines: ['Not retained'],
+    },
+  },
+  payment: {
+    totals: {
+      subtotal: 24,
+      fees: 2,
+      discounts: 0,
+      tips: 1,
+      vouchers: 0,
+      accountCredits: 0,
+      complimentary: 0,
+      totalToPay: 27,
+      totalPaid: 27,
+    },
+    fees: { delivery: 1.5, serviceCharge: 0.5 },
+    payments: [{ displayName: 'Demo payment', value: 27 }],
+  },
+  restaurant: {
+    id: 'fake-place',
+    displayName: 'Imaginary Noodle Attic',
+    cuisines: [{ name: 'Thai', rank: 1 }],
+  },
+  status: { value: 'delivered', finishedAt: null },
+};
+test('normalisation converts euros to cents and keeps only the coarse delivery area', () => {
+  const o = normalizeDetail(fake);
+  expect(o.money.total).toBe(2700);
+  expect(o.items[0]?.total).toBe(2400);
+  expect(o.placedAt).toBe('2026-03-01T23:30:00+01:00');
+  expect(o.home).toEqual({ key: '1', postcode: '0001', city: 'Demo city' });
+  expect(JSON.stringify(o)).not.toContain('Not retained');
+  expect(JSON.stringify(o)).not.toContain('example.invalid');
+});
+test('a changed response reports field paths without values', () => {
+  expect(() =>
+    normalizeDetail({
+      ...fake,
+      restaurant: { id: 123, displayName: 'Secret pretend name' },
+    }),
+  ).toThrow('restaurant.id');
+  try {
+    normalizeDetail({
+      ...fake,
+      restaurant: { id: 123, displayName: 'Secret pretend name' },
+    });
+  } catch (e) {
+    expect(String(e)).not.toContain('Secret pretend name');
+  }
+});

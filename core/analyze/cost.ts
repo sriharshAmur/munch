@@ -1,4 +1,50 @@
-import type {Order} from '../schema';
-import {delivered,groups,local,sum} from './shared';
-import {calendar} from './calendar';
-export function cost(orders:Order[]) {const o=delivered(orders),totals={items:0,deliveryFee:0,serviceFee:0,smallOrderFee:0,tip:0,discount:0,adjustments:0,total:0};for(const v of o)for(const key of Object.keys(totals)){if(key in v.money) { switch(key){case 'items':case 'deliveryFee':case 'serviceFee':case 'smallOrderFee':case 'tip':case 'discount':case 'adjustments':case 'total':totals[key]+=v.money[key];}}}const days=calendar(o).days;const payday=days.filter(d=>Number(d.date.slice(-2))>=26&&Number(d.date.slice(-2))<=30),rest=days.filter(d=>!payday.includes(d));return {totals,years:[...groups(o,v=>String(local(v.placedAt).year))].map(([year,v])=>({year:Number(year),average:Math.round(sum(v.map(o=>o.money.total))/v.length)})),paydayRate:payday.length?sum(payday.map(d=>d.count))/payday.length:0,otherRate:rest.length?sum(rest.map(d=>d.count))/rest.length:0};}
+import type { Order } from '../schema';
+import { delivered, groups, local, sum } from './shared';
+import { calendar } from './calendar';
+export function cost(orders: Order[]) {
+  const o = delivered(orders),
+    totals = {
+      items: 0,
+      deliveryFee: 0,
+      serviceFee: 0,
+      smallOrderFee: 0,
+      tip: 0,
+      discount: 0,
+      adjustments: 0,
+      total: 0,
+    };
+  for (const v of o)
+    for (const key of Object.keys(totals)) {
+      if (key in v.money) {
+        switch (key) {
+          case 'items':
+          case 'deliveryFee':
+          case 'serviceFee':
+          case 'smallOrderFee':
+          case 'tip':
+          case 'discount':
+          case 'adjustments':
+          case 'total':
+            totals[key] += v.money[key];
+        }
+      }
+    }
+  const days = calendar(o).days;
+  const payday = days.filter(
+      (d) => Number(d.date.slice(-2)) >= 26 && Number(d.date.slice(-2)) <= 30,
+    ),
+    rest = days.filter((d) => !payday.includes(d));
+  return {
+    totals,
+    years: [...groups(o, (v) => String(local(v.placedAt).year))].map(
+      ([year, v]) => ({
+        year: Number(year),
+        average: Math.round(sum(v.map((o) => o.money.total)) / v.length),
+      }),
+    ),
+    paydayRate: payday.length
+      ? sum(payday.map((d) => d.count)) / payday.length
+      : 0,
+    otherRate: rest.length ? sum(rest.map((d) => d.count)) / rest.length : 0,
+  };
+}
