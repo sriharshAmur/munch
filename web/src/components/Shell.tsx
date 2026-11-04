@@ -17,6 +17,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuGroup,
+  DropdownMenuLabel,
 } from './ui/dropdown-menu';
 import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
 import { Badge } from './ui/badge';
@@ -24,7 +25,7 @@ import { useData, useHomeName } from '@/data/provider';
 import { useFilters } from '@/lib/search';
 import { availableHomes, availableYears } from '@core/analyze/filter';
 import { date } from '@/lib/format';
-import { PlateMark } from './PlateMark';
+import { BiteMark } from './BiteMark';
 export function Shell() {
   const homeName = useHomeName();
   const { state, loadDemo, openFile, forget } = useData(),
@@ -38,17 +39,17 @@ export function Shell() {
   return (
     <>
       <a className="skip-link" href="#content">
-        Skip to the story
+        Skip to the content
       </a>
       <header className="topbar">
         <div className="nav-main">
           <Link to="/" search={{}} className="wordmark">
-            <PlateMark />
+            <BiteMark />
             munch
           </Link>
           <nav aria-label="Main">
             {[
-              { to: '/', label: 'Story' },
+              { to: '/', label: 'You' },
               { to: '/orders', label: 'Orders' },
               { to: '/places', label: 'Places' },
             ].map((l) => (
@@ -103,7 +104,7 @@ export function Shell() {
                 <SelectLabel>Homes</SelectLabel>
                 {availableHomes(orders).map((h) => (
                   <SelectItem key={h.key} value={`home:${h.key}`}>
-                    {homeName(h.key)} · {h.city}
+                    {homeName(h.key)}, {h.city}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -113,16 +114,18 @@ export function Shell() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="data-button">
                 <Badge variant="secondary">
-                  {state.kind === 'ready'
-                    ? state.demo
-                      ? 'Demo'
-                      : `Your orders, updated ${date(state.file.generatedAt)}`
-                    : 'Your data'}
+                  {state.kind === 'ready' ? (state.demo ? 'Demo' : 'Your orders') : 'Your data'}
                 </Badge>
                 <ChevronDown />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {state.kind === 'ready' && (
+                <DropdownMenuLabel className="data-label">
+                  {state.demo ? 'A made-up person' : 'Your orders'}, {state.file.orders.length.toLocaleString('en-GB')} in all
+                  <span>Updated {date(state.file.generatedAt, true)}</span>
+                </DropdownMenuLabel>
+              )}
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   onSelect={() => {

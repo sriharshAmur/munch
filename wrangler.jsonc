@@ -1,0 +1,11 @@
+{
+  // Served at https://sriharsh.com/munch/ as a Worker with static assets, next to the portfolio.
+  // `bun run build:site` builds the app under /munch/ with the made-up demo only; your orders never ship.
+  // dist/index.html is a copy of the app, so a deep link such as /munch/orders falls back to it.
+  "name": "munch",
+  "compatibility_date": "2026-10-30",
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" },
+  "routes": [{ "pattern": "sriharsh.com/munch*", "zone_name": "sriharsh.com" }]
+}

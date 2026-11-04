@@ -9,8 +9,9 @@ import {
 import { DataProvider, useData } from './data/provider';
 import { Shell } from './components/Shell';
 import { Start } from './routes/start';
-import { Story } from './routes/story';
-import { Orders, Places } from './routes/explorer';
+import { Home } from './home/Home';
+import { Orders } from './routes/orders';
+import { Places } from './routes/places';
 import { SearchSchema } from './lib/search';
 import { Toaster } from './components/ui/sonner';
 import { Skeleton } from './components/ui/skeleton';
@@ -36,7 +37,7 @@ const routes = [
     path: '/',
     component: () => (
       <Ready>
-        <Story />
+        <Home />
       </Ready>
     ),
   }),
@@ -64,7 +65,10 @@ const routes = [
     ),
   }),
 ];
-const router = createRouter({ routeTree: rootRoute.addChildren(routes) });
+const router = createRouter({
+  routeTree: rootRoute.addChildren(routes),
+  basepath: import.meta.env.BASE_URL.replace(/\/$/, '') || '/',
+});
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router;

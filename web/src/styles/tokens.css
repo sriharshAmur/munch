@@ -38,6 +38,31 @@
   --m-size-small: 0.875rem;
   --m-size-tick: 0.8125rem;
   --m-size-stat: clamp(2rem, 1.6rem + 1.4vw, 2.75rem);
+  --m-stage-night-bg: #170f1a;
+  --m-stage-night-fg: #f6ede9;
+  --m-stage-night-hi: #f2b13a;
+  --m-stage-lamp-bg: #f2b13a;
+  --m-stage-lamp-fg: #24162a;
+  --m-stage-lamp-hi: #5a2d00;
+  --m-stage-violet-bg: #33227a;
+  --m-stage-violet-fg: #f6ede9;
+  --m-stage-violet-hi: #f7c766;
+  --m-stage-leaf-bg: #0c4a3a;
+  --m-stage-leaf-fg: #f6ede9;
+  --m-stage-leaf-hi: #f7c766;
+  --m-stage-ember-bg: #7a2a14;
+  --m-stage-ember-fg: #f6ede9;
+  --m-stage-ember-hi: #f7c766;
+  --m-duration-press: 120ms;
+  --m-duration-swap: 180ms;
+  --m-duration-sheet: 280ms;
+  --m-duration-plate: 2400ms;
+  --m-duration-morph: 1100ms;
+  --m-duration-stagger: 700ms;
+  --m-duration-slide: 6000ms;
+  --m-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --m-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --m-ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 [data-theme="dark"] {
   --m-bg: #1e1422;

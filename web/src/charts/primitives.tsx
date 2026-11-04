@@ -8,23 +8,13 @@ import {
   type KeyboardEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { useNavigate } from '@tanstack/react-router';
 import { useFilters, type Search } from '@/lib/search';
-export const dataColor = (index: number) =>
-  index < 5 ? `var(--m-data-${index + 1})` : 'var(--m-muted)';
 export function hrefFor(search: Search = {}, route = '/orders') {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(search))
     if (value !== undefined) params.set(key, String(value));
-  return `${route}${params.size ? '?' + params : ''}`;
+  return `${import.meta.env.BASE_URL.replace(/\/$/, '')}${route}${params.size ? '?' + params : ''}`;
 }
 export function useSize() {
   const ref = useRef<HTMLDivElement>(null),
@@ -93,7 +83,8 @@ export function Mark({
   children: ReactNode;
 }) {
   const ctx = useContext(Context),
-    base = useFilters();
+    base = useFilters(),
+    navigate = useNavigate();
   function keys(e: KeyboardEvent<Element>) {
     if (
       ![
@@ -136,6 +127,13 @@ export function Mark({
       tabIndex={ctx.active === index ? 0 : -1}
       aria-label={`${title}. ${detail}`}
       onKeyDown={keys}
+      onClick={(e) => {
+        // Stay in the app: the router swaps the page without a reload.
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+        e.preventDefault();
+        ctx.setTip(null);
+        void navigate({ to: route, search: { ...base, ...search } });
+      }}
       onPointerMove={(e) =>
         ctx.setTip({ x: e.clientX, y: e.clientY, title, detail })
       }
@@ -148,140 +146,5 @@ export function Mark({
     >
       {children}
     </a>
-  );
-}
-export function Numbers({
-  headers,
-  rows,
-}: {
-  headers: string[];
-  rows: (string | number)[][];
-}) {
-  return (
-    <div className="numbers">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {headers.map((h) => (
-              <TableHead key={h}>{h}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((row, i) => (
-            <TableRow key={i}>
-              {row.map((cell, j) => (
-                <TableCell key={j}>{cell}</TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
-export function Figure({
-  caption,
-  headers,
-  rows,
-  children,
-}: {
-  caption: string;
-  headers: string[];
-  rows: (string | number)[][];
-  children: ReactNode;
-}) {
-  const [numbers, setNumbers] = useState(false);
-  return (
-    <figure>
-      {numbers ? (
-        <Numbers headers={headers} rows={rows} />
-      ) : (
-        <Interactive>{children}</Interactive>
-      )}
-      <figcaption>
-        <span>{caption}</span>
-        <Button
-          variant="ghost"
-          aria-pressed={numbers}
-          onClick={() => setNumbers((v) => !v)}
-        >
-          {numbers ? 'Show the figure' : 'Show the numbers'}
-        </Button>
-      </figcaption>
-    </figure>
-  );
-}
-export function Chapter({
-  id,
-  title,
-  lede,
-  children,
-}: {
-  id: string;
-  title: string;
-  lede: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <section id={id} className="chapter">
-      <div className="chapter-heading">
-        <h2 className="text-title">{title}</h2>
-        <p className="text-lede">{lede}</p>
-      </div>
-      {children}
-    </section>
-  );
-}
-export function Grid({
-  ticks,
-  width,
-  height,
-  format = (n: number) => String(n),
-}: {
-  ticks: number[];
-  width: number;
-  height: number;
-  format?: (n: number) => string;
-}) {
-  const max = ticks.at(-1) ?? 1;
-  return (
-    <g aria-hidden="true">
-      {ticks.map((t) => (
-        <g key={t}>
-          <line
-            x1="42"
-            x2={width - 8}
-            y1={height - 30 - (t / max) * (height - 60)}
-            y2={height - 30 - (t / max) * (height - 60)}
-            stroke={t === 0 ? 'var(--m-line-strong)' : 'var(--m-line)'}
-          />
-          <text
-            x="0"
-            y={height - 26 - (t / max) * (height - 60)}
-            className="text-tick"
-          >
-            {format(t)}
-          </text>
-        </g>
-      ))}
-    </g>
-  );
-}
-export function Axis({
-  ticks,
-  y,
-}: {
-  ticks: { x: number; label: string }[];
-  y: number;
-}) {
-  return (
-    <g aria-hidden="true">
-      {ticks.map((t, i) => (
-        <text key={i} x={t.x} y={y} className="text-tick" textAnchor="middle">
-          {t.label}
-        </text>
-      ))}
-    </g>
   );
 }

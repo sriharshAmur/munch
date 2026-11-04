@@ -38,7 +38,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<DataState>({ kind: 'loading' });
   async function loadDemo() {
     try {
-      const response = await fetch('/demo/orders.json');
+      const response = await fetch(`${import.meta.env.BASE_URL}demo/orders.json`);
       const file = OrdersFileSchema.parse(await response.json());
       localStorage.setItem('munch-demo', 'true');
       const homeNames = await loadHomeNames(file, true);

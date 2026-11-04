@@ -1,8 +1,40 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { OrdersFileSchema } from '@core/schema';
+import { noticed } from '@core/analyze/noticed';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { useData } from '@/data/provider';
-import { PlateMark } from '@/components/PlateMark';
+import { tickets, TicketCard, type Ticket } from '@/story/Rail';
+
+const wanted = ['ritual', 'ghosted', 'inflation'];
+
+/** Three of the made-up person's tickets, fanned out beside the invitation. */
+function Preview() {
+  const [list, setList] = useState<Ticket[]>([]);
+  useEffect(() => {
+    let live = true;
+    void fetch(`${import.meta.env.BASE_URL}demo/orders.json`)
+      .then((r) => r.json())
+      .then((v) => {
+        const file = OrdersFileSchema.parse(v);
+        const all = tickets(noticed(file.orders, file.generatedAt), file.orders, file.generatedAt, () => 'Home');
+        if (live) setList(wanted.flatMap((k) => all.filter((t) => t.key === k)));
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+  return (
+    <div className="start-preview" aria-hidden="true" inert>
+      {list.map((t, i) => (
+        <div key={t.key} className="start-ticket" style={{ '--n': i } as React.CSSProperties}>
+          <TicketCard ticket={t} tilt={[-6, 3, -2][i] ?? 0} />
+        </div>
+      ))}
+    </div>
+  );
+}
 export function Start() {
   const { loadDemo, openFile, state } = useData(),
     navigate = useNavigate(),
@@ -17,17 +49,15 @@ export function Start() {
         if (f) void openFile(f).then(() => navigate({ to: '/', search: {} }));
       }}
     >
-      <div className="empty-plate">
-        <PlateMark />
-      </div>
+      <Preview />
       <h1 className="text-display">
         There’s a story
         <br />
         in your usual.
       </h1>
       <p className="text-lede">
-        Your Friday evenings. The place you always come back to. Years of
-        dinner, seen together.
+        Your Friday evenings. The place you always come back to. A year of
+        dinners, seen together.
       </p>
       <div className="start-actions">
         <Button

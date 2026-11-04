@@ -8,7 +8,7 @@ export async function loadHomeNames(
   if (demo || import.meta.env.DEV) {
     try {
       const response = await fetch(
-        demo ? '/demo/homes.json' : '/local/homes.json',
+        demo ? `${import.meta.env.BASE_URL}demo/homes.json` : '/local/homes.json',
       );
       if (response.ok) {
         const metadata = HomeLabelsSchema.parse(await response.json());

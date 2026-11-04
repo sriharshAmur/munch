@@ -6,6 +6,8 @@ import { createReadStream, existsSync } from 'node:fs';
 const root = import.meta.dirname;
 export default defineConfig({
   root: 'web',
+  // The public site lives at sriharsh.com/munch/; MUNCH_BASE=/munch/ builds it there.
+  base: process.env.MUNCH_BASE ?? '/',
   publicDir: 'public',
   plugins: [
     react(),
@@ -13,6 +15,15 @@ export default defineConfig({
     {
       name: 'local-orders',
       configureServer(server) {
+        // MUNCH_DEMO_ONLY serves the made-up person only: screenshots and
+        // automated checks must never see a real orders file.
+        if (process.env.MUNCH_DEMO_ONLY) {
+          server.middlewares.use('/local/', (_req, res) => {
+            res.statusCode = 404;
+            res.end();
+          });
+          return;
+        }
         const localFile = resolve(root, 'data/orders.json');
         server.watcher.add(localFile);
         const notify = (path: string) => {

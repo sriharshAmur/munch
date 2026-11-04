@@ -30,3 +30,4 @@ coverage/
 
 # Copied browser requests, including the local handoff
 [Cc]url.txt
+.wrangler/
