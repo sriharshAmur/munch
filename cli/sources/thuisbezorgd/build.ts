@@ -1,0 +1,3 @@
+import {normalizeDetail} from './normalize';
+import {OrdersFileSchema} from '../../../core/schema';
+export async function build(){const paths=[...new Bun.Glob('*.json').scanSync('data/raw/thuisbezorgd/probes')];const orders=[];for(const name of paths){const input:unknown=await Bun.file(`data/raw/thuisbezorgd/probes/${name}`).json();orders.push(normalizeDetail(input));}const unique=[...new Map(orders.map(o=>[o.id,o])).values()];const file=OrdersFileSchema.parse({version:1,source:'thuisbezorgd',generatedAt:new Date().toISOString(),orders:unique});await Bun.write('data/orders.json',JSON.stringify(file));process.stdout.write(`Built ${unique.length} orders.\n`);}

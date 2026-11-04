@@ -136,3 +136,7 @@ README in the style of Long Exposure's (what you get, getting your orders, your 
 - [x] Step 2: validated schema and repeatable demo person
 - [x] Step 3: pure analysis modules and prediction with behaviour tests
 - [x] Step 4: file loading, routes, shared filters and app shell
+
+## Current priority
+
+Sri asked to show his local import and provide `orders.json` before continuing the chapters. A temporary import summary and order lists are in place. The captured detail can be rebuilt and checked. Full-history fetching remains blocked by the website rejecting the copied session. Steps 5, 6, 7 and 8 are not marked complete.

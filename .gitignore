@@ -1,6 +1,6 @@
 # Private: your orders, raw responses and probe output never leave this machine
-data/
-shapes/
+/data/
+/shapes/
 exports/
 *.export.json
 *.har
@@ -27,3 +27,6 @@ coverage/
 
 # Personal notes
 *.private.md
+
+# Copied browser requests, including the local handoff
+[Cc]url.txt

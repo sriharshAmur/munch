@@ -1,2 +1,9 @@
-export function Orders(){return <h1 className="text-title">Every order</h1>;}
-export function Places(){return <h1 className="text-title">Your places</h1>;}
+import {useData} from '@/data/provider';
+import {useFilters} from '@/lib/search';
+import {applyFilter} from '@core/analyze/filter';
+import {regulars} from '@core/analyze/regulars';
+import {date,euros,plural} from '@/lib/format';
+import {Table,TableHeader,TableBody,TableRow,TableCell,TableHead} from '@/components/ui/table';
+import {Badge} from '@/components/ui/badge';
+export function Orders(){const {state}=useData(),filters=useFilters();const orders=state.kind==='ready'?applyFilter(state.file.orders,filters):[];return <section><h1 className="text-title">Every order</h1><p className="text-lede" style={{margin:'20px 0 32px'}}>{plural(orders.length,'order')} in this view.</p><Table><TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Restaurant</TableHead><TableHead>Dishes</TableHead><TableHead className="text-right">Total</TableHead><TableHead>Delivery or pickup</TableHead></TableRow></TableHeader><TableBody>{[...orders].reverse().map(o=><TableRow key={o.id}><TableCell>{date(o.placedAt)}</TableCell><TableCell>{o.restaurant.name}</TableCell><TableCell className="dish-cell">{o.items.map(i=>`${i.quantity} × ${i.name}`).join(', ')}</TableCell><TableCell className="text-right tabular-nums">{euros(o.money.total)}</TableCell><TableCell><Badge variant="secondary">{o.fulfilment}</Badge>{o.group.isGroup&&<Badge variant="secondary">Group</Badge>}</TableCell></TableRow>)}</TableBody></Table></section>;}
+export function Places(){const {state}=useData(),filters=useFilters();const places=regulars(state.kind==='ready'?applyFilter(state.file.orders,filters):[]).places;return <section><h1 className="text-title">Your places</h1><Table><TableHeader><TableRow><TableHead>Restaurant</TableHead><TableHead>Orders</TableHead><TableHead className="text-right">Total paid</TableHead></TableRow></TableHeader><TableBody>{places.map(p=><TableRow key={p.id}><TableCell>{p.name}</TableCell><TableCell>{p.count}</TableCell><TableCell className="text-right">{euros(p.spend)}</TableCell></TableRow>)}</TableBody></Table></section>;}
