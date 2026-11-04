@@ -1,0 +1,3 @@
+import type {Order} from '../schema';
+import {delivered,groups,range,sum,typical} from './shared';
+export function regulars(orders:Order[]) {const o=delivered(orders),places=[...groups(o,v=>v.restaurant.id)].map(([id,rows])=>({id,name:rows[0]?.restaurant.name??'',count:rows.length,spend:sum(rows.map(v=>v.money.total)),...range(rows),visits:rows.map(v=>v.placedAt),typical:typical(rows),usual:[...groups(rows.flatMap(v=>v.items),i=>i.name)].map(([name,items])=>({name,count:sum(items.map(i=>i.quantity))})).sort((a,b)=>b.count-a.count)[0]?.name??''})).sort((a,b)=>b.count-a.count||a.id.localeCompare(b.id));return {places,topThreeShare:o.length?sum(places.slice(0,3).map(p=>p.count))/o.length:0};}
