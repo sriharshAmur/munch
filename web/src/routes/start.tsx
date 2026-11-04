@@ -1,6 +1,75 @@
-import {useRef} from 'react';
-import {useNavigate} from '@tanstack/react-router';
-import {Button} from '@/components/ui/button';
-import {useData} from '@/data/provider';
-import {PlateMark} from '@/components/PlateMark';
-export function Start(){const {loadDemo,openFile,state}=useData(),navigate=useNavigate(),input=useRef<HTMLInputElement>(null);return <section className="start" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const f=e.dataTransfer.files[0];if(f)void openFile(f).then(()=>navigate({to:'/',search:{}}));}}><div className="empty-plate"><PlateMark/></div><h1 className="text-display">There’s a story<br/>in your usual.</h1><p className="text-lede">Your Friday evenings. The place you always come back to. Years of dinner, seen together.</p><div className="start-actions"><Button onClick={()=>{void loadDemo().then(()=>navigate({to:'/',search:{}}));}}>See the demo</Button><Button variant="outline" onClick={()=>input.current?.click()}>Open my orders.json</Button></div><input ref={input} type="file" accept=".json,application/json" className="sr-only" aria-label="Choose orders file" onChange={e=>{const f=e.target.files?.[0];if(f)void openFile(f).then(()=>navigate({to:'/',search:{}}));}}/>{state.kind==='empty'&&state.error&&<p role="alert" className="error">{state.error}</p>}<p className="text-body">Your file stays in this browser. Nothing is uploaded.</p><details><summary>How do I get my orders?</summary><p className="text-body">Run <code>bun run munch probe orders</code> with your own signed-in browser session. The fetcher is waiting for its first redacted probe. You can explore the demo while it takes shape.</p></details></section>;}
+import { useRef } from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
+import { useData } from '@/data/provider';
+import { PlateMark } from '@/components/PlateMark';
+export function Start() {
+  const { loadDemo, openFile, state } = useData(),
+    navigate = useNavigate(),
+    input = useRef<HTMLInputElement>(null);
+  return (
+    <section
+      className="start"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        const f = e.dataTransfer.files[0];
+        if (f) void openFile(f).then(() => navigate({ to: '/', search: {} }));
+      }}
+    >
+      <div className="empty-plate">
+        <PlateMark />
+      </div>
+      <h1 className="text-display">
+        There’s a story
+        <br />
+        in your usual.
+      </h1>
+      <p className="text-lede">
+        Your Friday evenings. The place you always come back to. Years of
+        dinner, seen together.
+      </p>
+      <div className="start-actions">
+        <Button
+          onClick={() => {
+            void loadDemo().then(() => navigate({ to: '/', search: {} }));
+          }}
+        >
+          See the demo
+        </Button>
+        <Button variant="outline" onClick={() => input.current?.click()}>
+          Open my orders.json
+        </Button>
+      </div>
+      <input
+        ref={input}
+        type="file"
+        tabIndex={-1}
+        aria-hidden="true"
+        accept=".json,application/json"
+        className="sr-only"
+        aria-label="Choose orders file"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void openFile(f).then(() => navigate({ to: '/', search: {} }));
+        }}
+      />
+      {state.kind === 'empty' && state.error && (
+        <p role="alert" className="error">
+          {state.error}
+        </p>
+      )}
+      <p className="text-body">
+        Your file stays in this browser. Nothing is uploaded.
+      </p>
+      <details>
+        <summary>How do I get my orders?</summary>
+        <p className="text-body">
+          Run <code>bun run munch probe orders</code> with your own signed-in
+          browser session. Then run munch fetch and munch build to make your
+          orders file. You can also explore the demo first.
+        </p>
+      </details>
+    </section>
+  );
+}

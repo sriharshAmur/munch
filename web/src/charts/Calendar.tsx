@@ -1,5 +1,104 @@
-import {calendar} from '@core/analyze/calendar';
-import type {Order} from '@core/schema';
-import {date,plural} from '@/lib/format';
-import {Chapter,Figure,Mark} from './primitives';
-export function CalendarChapter({orders}:{orders:Order[]}){const c=calendar(orders),years=[...new Set(c.days.map(d=>Number(d.date.slice(0,4))))],max=Math.max(1,...c.days.map(d=>d.count));return <Chapter id="streaks-and-gaps" title="Streaks and gaps" lede={<>Your longest run was {plural(c.streak.days,'day')} in a row.{c.gap.days>0&&<> Your longest pause lasted {plural(c.gap.days,'day')}, starting {date(c.gap.start+'T12:00:00Z')}.</>}</>}><Figure caption={`One square, one day. The outlined squares mark your longest run and longest pause. ${years.length>2?'Each row is a year.':''} Scroll across on a smaller screen.`} headers={['Day','Orders']} rows={c.days.map(d=>[date(d.date+'T12:00:00Z',true),d.count])}><div className="calendar-scroll"><svg width="660" height={years.length*106+40} aria-label="Order calendar, with longest streak and gap highlighted">{Array.from({length:12},(_,i)=><text key={i} x={50+i*50} y="14" className="text-tick">{new Intl.DateTimeFormat('en',{month:'short'}).format(new Date(2024,i,1))}</text>)}{years.map((year,yi)=>{const start=Date.UTC(year,0,1),offset=(new Date(start).getUTCDay()+6)%7;return <g key={year}><text x="0" y={yi*106+49} className="text-tick">{year}</text>{c.days.filter(d=>Number(d.date.slice(0,4))===year).map(d=>{const day=Math.round((Date.parse(d.date)-start)/86400000),week=Math.floor((day+offset)/7),weekday=(day+offset)%7,streak=d.date>=c.streak.start&&d.date<=c.streak.end,gap=d.date>=c.gap.start&&d.date<=c.gap.end,index=c.days.indexOf(d);return <Mark key={d.date} index={index} title={date(d.date+'T12:00:00Z',true)} detail={`${plural(d.count,'order')}${streak?' · Longest run':''}${gap?' · Longest pause':''}`} search={{date:d.date}}><rect x={50+week*11} y={30+yi*106+weekday*11} width="9" height="9" rx="2" fill={d.count?`var(--m-seq-${Math.min(5,Math.ceil(d.count/max*5))})`:'var(--m-raised)'} stroke={streak||gap?'var(--m-ink)':'none'} strokeWidth="1"/></Mark>;})}</g>;})}</svg></div><div className="calendar-notes"><span>Longest run · {c.streak.days} days</span><span>Longest pause · {c.gap.days} days</span>{c.busiestWeek&&<span>Busiest week · {c.busiestWeek.count} orders</span>}</div></Figure></Chapter>;}
+import { calendar } from '@core/analyze/calendar';
+import type { Order } from '@core/schema';
+import { date, plural } from '@/lib/format';
+import { Chapter, Figure, Mark } from './primitives';
+export function CalendarChapter({ orders }: { orders: Order[] }) {
+  const c = calendar(orders),
+    years = [...new Set(c.days.map((d) => Number(d.date.slice(0, 4))))],
+    max = Math.max(1, ...c.days.map((d) => d.count));
+  return (
+    <Chapter
+      id="streaks-and-gaps"
+      title="Streaks and gaps"
+      lede={
+        <>
+          Your longest run was {plural(c.streak.days, 'day')} in a row.
+          {c.gap.days > 0 && (
+            <>
+              {' '}
+              Your longest pause lasted {plural(c.gap.days, 'day')}, starting{' '}
+              {date(c.gap.start + 'T12:00:00Z')}.
+            </>
+          )}
+        </>
+      }
+    >
+      <Figure
+        caption={`One square, one day. The outlined squares mark your longest run and longest pause. ${years.length > 2 ? 'Each row is a year.' : ''} Scroll across on a smaller screen.`}
+        headers={['Day', 'Orders']}
+        rows={c.days.map((d) => [date(d.date + 'T12:00:00Z', true), d.count])}
+      >
+        <div className="calendar-scroll">
+          <svg
+            width="660"
+            height={years.length * 106 + 40}
+            aria-label="Order calendar, with longest streak and gap highlighted"
+          >
+            {Array.from({ length: 12 }, (_, i) => (
+              <text key={i} x={50 + i * 50} y="14" className="text-tick">
+                {new Intl.DateTimeFormat('en', { month: 'short' }).format(
+                  new Date(2024, i, 1),
+                )}
+              </text>
+            ))}
+            {years.map((year, yi) => {
+              const start = Date.UTC(year, 0, 1),
+                offset = (new Date(start).getUTCDay() + 6) % 7;
+              return (
+                <g key={year}>
+                  <text x="0" y={yi * 106 + 49} className="text-tick">
+                    {year}
+                  </text>
+                  {c.days
+                    .filter((d) => Number(d.date.slice(0, 4)) === year)
+                    .map((d) => {
+                      const day = Math.round(
+                          (Date.parse(d.date) - start) / 86400000,
+                        ),
+                        week = Math.floor((day + offset) / 7),
+                        weekday = (day + offset) % 7,
+                        streak =
+                          d.date >= c.streak.start && d.date <= c.streak.end,
+                        gap = d.date >= c.gap.start && d.date <= c.gap.end,
+                        index = c.days.indexOf(d);
+                      return (
+                        <Mark
+                          key={d.date}
+                          index={index}
+                          title={date(d.date + 'T12:00:00Z', true)}
+                          detail={`${plural(d.count, 'order')}${streak ? ' · Longest run' : ''}${gap ? ' · Longest pause' : ''}`}
+                          search={{ date: d.date }}
+                        >
+                          <rect
+                            x={50 + week * 11}
+                            y={30 + yi * 106 + weekday * 11}
+                            width="9"
+                            height="9"
+                            rx="2"
+                            fill={
+                              d.count
+                                ? `var(--m-seq-${Math.min(5, Math.ceil((d.count / max) * 5))})`
+                                : 'var(--m-raised)'
+                            }
+                            stroke={streak || gap ? 'var(--m-ink)' : 'none'}
+                            strokeWidth="1"
+                          />
+                        </Mark>
+                      );
+                    })}
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+        <div className="calendar-notes">
+          <span>Longest run · {c.streak.days} days</span>
+          <span>Longest pause · {c.gap.days} days</span>
+          {c.busiestWeek && (
+            <span>Busiest week · {c.busiestWeek.count} orders</span>
+          )}
+        </div>
+      </Figure>
+    </Chapter>
+  );
+}

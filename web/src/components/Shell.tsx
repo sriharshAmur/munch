@@ -1,16 +1,204 @@
-import {useRef,useState} from 'react';
-import {Link,Outlet,useNavigate} from '@tanstack/react-router';
-import {Monitor,Sun,Moon,ChevronDown} from 'lucide-react';
-import {Button} from './ui/button';
-import {Select,SelectTrigger,SelectValue,SelectContent,SelectItem,SelectGroup,SelectLabel} from './ui/select';
-import {DropdownMenu,DropdownMenuTrigger,DropdownMenuContent,DropdownMenuItem,DropdownMenuGroup} from './ui/dropdown-menu';
-import {ToggleGroup,ToggleGroupItem} from './ui/toggle-group';
-import {Badge} from './ui/badge';
-import {useData} from '@/data/provider';
-import {useFilters} from '@/lib/search';
-import {availableHomes,availableYears} from '@core/analyze/filter';
-import {date} from '@/lib/format';
-import {PlateMark} from './PlateMark';
-export function Shell(){const {state,loadDemo,openFile,forget}=useData(),filters=useFilters(),navigate=useNavigate(),fileInput=useRef<HTMLInputElement>(null);const [theme,setTheme]=useState(()=>localStorage.getItem('munch-theme')??'auto');const orders=state.kind==='ready'?state.file.orders:[];
- return <><a className="skip-link" href="#content">Skip to the story</a><header className="topbar"><div className="nav-main"><Link to="/" search={{}} className="wordmark"><PlateMark/>munch</Link><nav aria-label="Main">{[{to:'/',label:'Story'},{to:'/orders',label:'Orders'},{to:'/places',label:'Places'}].map(l=><Link key={l.to} to={l.to} search={filters} activeOptions={{exact:true}} activeProps={{className:'active'}}>{l.label}</Link>)}</nav></div><div className="nav-tools"><Select value={filters.year?`year:${filters.year}`:filters.home?`home:${filters.home}`:'all'} onValueChange={value=>{void navigate({to:'.',search:{...filters,year:value.startsWith('year:')?Number(value.slice(5)):undefined,home:value.startsWith('home:')?value.slice(5):undefined}});}}><SelectTrigger aria-label="Filter history"><SelectValue/></SelectTrigger><SelectContent><SelectGroup><SelectItem value="all">All time</SelectItem><SelectLabel>Years</SelectLabel>{availableYears(orders).map(y=><SelectItem key={y} value={`year:${y}`}>{y}</SelectItem>)}</SelectGroup><SelectGroup><SelectLabel>Homes</SelectLabel>{availableHomes(orders).map(h=><SelectItem key={h.key} value={`home:${h.key}`}>Home {h.key} · {h.city}</SelectItem>)}</SelectGroup></SelectContent></Select><DropdownMenu><DropdownMenuTrigger asChild><Button variant="outline" className="data-button"><Badge variant="secondary">{state.kind==='ready'?(state.demo?'Demo':`Your orders, updated ${date(state.file.generatedAt)}`):'Your data'}</Badge><ChevronDown/></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuGroup><DropdownMenuItem onSelect={()=>{void loadDemo().then(()=>navigate({to:'/',search:{}}));}}>See the demo</DropdownMenuItem><DropdownMenuItem onSelect={()=>fileInput.current?.click()}>Open my orders.json</DropdownMenuItem><DropdownMenuItem onSelect={()=>{void forget().then(()=>navigate({to:'/start',search:{}}));}}>Forget my file</DropdownMenuItem></DropdownMenuGroup></DropdownMenuContent></DropdownMenu><ToggleGroup type="single" value={theme} aria-label="Colour theme" onValueChange={v=>{if(!v)return;setTheme(v);document.documentElement.dataset.theme=v;localStorage.setItem('munch-theme',v);}} className="theme-switch">{[{value:'auto',Icon:Monitor,label:'Auto'},{value:'light',Icon:Sun,label:'Light'},{value:'dark',Icon:Moon,label:'Dark'}].map(({value,Icon,label})=><ToggleGroupItem key={value} value={value} aria-label={label}><Icon/></ToggleGroupItem>)}</ToggleGroup></div></header><input className="sr-only" ref={fileInput} type="file" accept=".json,application/json" aria-label="Open orders file" onChange={e=>{const f=e.target.files?.[0];if(f)void openFile(f).then(()=>navigate({to:'/',search:{}}));e.target.value='';}}/><main id="content"><Outlet/></main><footer><span>munch</span><span>{state.kind==='ready'&&state.demo?'A made-up person. Real patterns.':'Your orders, a little closer.'}</span><Link to="/start" search={{}}>About your data</Link></footer></>;
+import { useRef, useState } from 'react';
+import { Link, Outlet, useNavigate } from '@tanstack/react-router';
+import { Monitor, Sun, Moon, ChevronDown } from 'lucide-react';
+import { Button } from './ui/button';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  SelectGroup,
+  SelectLabel,
+} from './ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuGroup,
+} from './ui/dropdown-menu';
+import { ToggleGroup, ToggleGroupItem } from './ui/toggle-group';
+import { Badge } from './ui/badge';
+import { useData } from '@/data/provider';
+import { useFilters } from '@/lib/search';
+import { availableHomes, availableYears } from '@core/analyze/filter';
+import { date } from '@/lib/format';
+import { PlateMark } from './PlateMark';
+export function Shell() {
+  const { state, loadDemo, openFile, forget } = useData(),
+    filters = useFilters(),
+    navigate = useNavigate(),
+    fileInput = useRef<HTMLInputElement>(null);
+  const [theme, setTheme] = useState(
+    () => localStorage.getItem('munch-theme') ?? 'auto',
+  );
+  const orders = state.kind === 'ready' ? state.file.orders : [];
+  return (
+    <>
+      <a className="skip-link" href="#content">
+        Skip to the story
+      </a>
+      <header className="topbar">
+        <div className="nav-main">
+          <Link to="/" search={{}} className="wordmark">
+            <PlateMark />
+            munch
+          </Link>
+          <nav aria-label="Main">
+            {[
+              { to: '/', label: 'Story' },
+              { to: '/orders', label: 'Orders' },
+              { to: '/places', label: 'Places' },
+            ].map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                search={filters}
+                activeOptions={{ exact: true }}
+                activeProps={{ className: 'active' }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <div className="nav-tools">
+          <Select
+            value={
+              filters.year
+                ? `year:${filters.year}`
+                : filters.home
+                  ? `home:${filters.home}`
+                  : 'all'
+            }
+            onValueChange={(value) => {
+              void navigate({
+                to: '.',
+                search: {
+                  ...filters,
+                  year: value.startsWith('year:')
+                    ? Number(value.slice(5))
+                    : undefined,
+                  home: value.startsWith('home:') ? value.slice(5) : undefined,
+                },
+              });
+            }}
+          >
+            <SelectTrigger aria-label="Filter history">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="all">All time</SelectItem>
+                <SelectLabel>Years</SelectLabel>
+                {availableYears(orders).map((y) => (
+                  <SelectItem key={y} value={`year:${y}`}>
+                    {y}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Homes</SelectLabel>
+                {availableHomes(orders).map((h) => (
+                  <SelectItem key={h.key} value={`home:${h.key}`}>
+                    Home {h.key} · {h.city}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="data-button">
+                <Badge variant="secondary">
+                  {state.kind === 'ready'
+                    ? state.demo
+                      ? 'Demo'
+                      : `Your orders, updated ${date(state.file.generatedAt)}`
+                    : 'Your data'}
+                </Badge>
+                <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    void loadDemo().then(() =>
+                      navigate({ to: '/', search: {} }),
+                    );
+                  }}
+                >
+                  See the demo
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => fileInput.current?.click()}>
+                  Open my orders.json
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    void forget().then(() =>
+                      navigate({ to: '/start', search: {} }),
+                    );
+                  }}
+                >
+                  Forget my file
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <ToggleGroup
+            type="single"
+            value={theme}
+            aria-label="Colour theme"
+            onValueChange={(v) => {
+              if (!v) return;
+              setTheme(v);
+              document.documentElement.dataset.theme = v;
+              localStorage.setItem('munch-theme', v);
+            }}
+            className="theme-switch"
+          >
+            {[
+              { value: 'auto', Icon: Monitor, label: 'Auto' },
+              { value: 'light', Icon: Sun, label: 'Light' },
+              { value: 'dark', Icon: Moon, label: 'Dark' },
+            ].map(({ value, Icon, label }) => (
+              <ToggleGroupItem key={value} value={value} aria-label={label}>
+                <Icon />
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
+      </header>
+      <input
+        className="sr-only"
+        ref={fileInput}
+        type="file"
+        tabIndex={-1}
+        aria-hidden="true"
+        accept=".json,application/json"
+        aria-label="Open orders file"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void openFile(f).then(() => navigate({ to: '/', search: {} }));
+          e.target.value = '';
+        }}
+      />
+      <main id="content">
+        <Outlet />
+      </main>
+      <footer>
+        <span>munch</span>
+        <span>
+          {state.kind === 'ready' && state.demo
+            ? 'A made-up person. Real patterns.'
+            : 'Your orders, a little closer.'}
+        </span>
+        <Link to="/start" search={{}}>
+          About your data
+        </Link>
+      </footer>
+    </>
+  );
 }

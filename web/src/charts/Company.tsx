@@ -1,6 +1,100 @@
-import {company} from '@core/analyze/company';
-import type {Order} from '@core/schema';
-import {euros,percent,plural} from '@/lib/format';
-import {Chapter,Figure,Mark} from './primitives';
-import {WeekGrid} from './Week';
-export function CompanyChapter({orders}:{orders:Order[]}){const c=company(orders),solo=1-c.groupShare;return <Chapter id="company" title="Company" lede={<>{plural(c.group,'group order')} make up {percent(c.groupShare)} of your history.{c.group>0&&<> The average group basket is {euros(c.groupAverage)}, compared with {euros(c.soloAverage)} on your own.</>}</>}><Figure caption="Group orders are the ones the source marks as shared. Larger baskets alone do not make an order a group order." headers={['Company','Orders','Share','Average basket']} rows={[["On your own",c.solo,percent(solo),euros(c.soloAverage)],['Group',c.group,percent(c.groupShare),euros(c.groupAverage)]]}><div className="company-summary"><svg width="90" height="240" aria-label="Share of solo and group orders"><Mark index={0} title="On your own" detail={`${plural(c.solo,'order')} · ${percent(solo)}`} search={{company:'solo'}}><rect x="10" y="0" width="60" height={solo*230} rx="4" fill="var(--m-data-1)"/></Mark><Mark index={1} title="Group orders" detail={`${plural(c.group,'order')} · ${percent(c.groupShare)}`} search={{company:'group'}}><rect x="10" y={solo*230+2} width="60" height={Math.max(0,c.groupShare*230-2)} rx="4" fill="var(--m-data-2)"/></Mark></svg><div className="basket-stats"><div><span><i style={{background:'var(--m-data-1)'}}/>On your own · {percent(solo)}</span><strong className="text-stat">{euros(c.soloAverage)}</strong><small>Average basket</small></div><div><span><i style={{background:'var(--m-data-2)'}}/>Group · {percent(c.groupShare)}</span><strong className="text-stat">{euros(c.groupAverage)}</strong><small>Average basket</small></div></div></div><div className="chart-unit">When you order together</div>{c.group?<WeekGrid cells={c.cells} dots/>:<p className="empty-finding">No group orders in this view.</p>}</Figure></Chapter>;}
+import { company } from '@core/analyze/company';
+import type { Order } from '@core/schema';
+import { euros, percent, plural } from '@/lib/format';
+import { Chapter, Figure, Mark } from './primitives';
+import { WeekGrid } from './Week';
+export function CompanyChapter({ orders }: { orders: Order[] }) {
+  const c = company(orders),
+    solo = 1 - c.groupShare;
+  return (
+    <Chapter
+      id="company"
+      title="Company"
+      lede={
+        <>
+          {plural(c.group, 'group order')} make up {percent(c.groupShare)} of
+          your history.
+          {c.group > 0 && (
+            <>
+              {' '}
+              The average group basket is {euros(c.groupAverage)}, compared with{' '}
+              {euros(c.soloAverage)} on your own.
+            </>
+          )}
+        </>
+      }
+    >
+      <Figure
+        caption="Group orders are the ones the source marks as shared. Larger baskets alone do not make an order a group order."
+        headers={['Company', 'Orders', 'Share', 'Average basket']}
+        rows={[
+          ['On your own', c.solo, percent(solo), euros(c.soloAverage)],
+          ['Group', c.group, percent(c.groupShare), euros(c.groupAverage)],
+        ]}
+      >
+        <div className="company-summary">
+          <svg
+            width="90"
+            height="240"
+            aria-label="Share of solo and group orders"
+          >
+            <Mark
+              index={0}
+              title="On your own"
+              detail={`${plural(c.solo, 'order')} · ${percent(solo)}`}
+              search={{ company: 'solo' }}
+            >
+              <rect
+                x="10"
+                y="0"
+                width="60"
+                height={solo * 230}
+                rx="4"
+                fill="var(--m-data-1)"
+              />
+            </Mark>
+            <Mark
+              index={1}
+              title="Group orders"
+              detail={`${plural(c.group, 'order')} · ${percent(c.groupShare)}`}
+              search={{ company: 'group' }}
+            >
+              <rect
+                x="10"
+                y={solo * 230 + 2}
+                width="60"
+                height={Math.max(0, c.groupShare * 230 - 2)}
+                rx="4"
+                fill="var(--m-data-2)"
+              />
+            </Mark>
+          </svg>
+          <div className="basket-stats">
+            <div>
+              <span>
+                <i style={{ background: 'var(--m-data-1)' }} />
+                On your own · {percent(solo)}
+              </span>
+              <strong className="text-stat">{euros(c.soloAverage)}</strong>
+              <small>Average basket</small>
+            </div>
+            <div>
+              <span>
+                <i style={{ background: 'var(--m-data-2)' }} />
+                Group · {percent(c.groupShare)}
+              </span>
+              <strong className="text-stat">{euros(c.groupAverage)}</strong>
+              <small>Average basket</small>
+            </div>
+          </div>
+        </div>
+        <div className="chart-unit">When you order together</div>
+        {c.group ? (
+          <WeekGrid cells={c.cells} dots />
+        ) : (
+          <p className="empty-finding">No group orders in this view.</p>
+        )}
+      </Figure>
+    </Chapter>
+  );
+}

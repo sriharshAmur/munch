@@ -1,6 +1,99 @@
-import {useState} from 'react';
-import {scaleLinear,scalePoint} from 'd3-scale';
-import {line,curveMonotoneX} from 'd3-shape';
-import {Axis,Grid,Mark,useSize} from './primitives';
-import type {Search} from '@/lib/search';
-export function LineChart({rows,label,format}:{rows:{label:string;value:number;search:Search}[];label:string;format:(n:number)=>string}){const {ref,width}=useSize(),[active,setActive]=useState<number|null>(null),height=260,max=Math.max(.000001,...rows.map(v=>v.value)),y=scaleLinear().domain([0,max]).nice(3).range([height-30,30]),x=scalePoint().domain(rows.map(v=>v.label)).range([48,width-80]),path=line<(typeof rows)[number]>().x(d=>x(d.label)??48).y(d=>y(d.value)).curve(curveMonotoneX)(rows),interval=Math.max(1,Math.ceil(rows.length/(width<500?4:10)));return <div ref={ref} onPointerLeave={()=>setActive(null)}><svg width={width} height={height} aria-label={label}><Grid ticks={y.ticks(3)} width={width} height={height} format={format}/>{path&&<path d={path} fill="none" stroke="var(--m-data-1)" strokeWidth="2"/>}{active!==null&&rows[active]&&<line x1={x(rows[active].label)} x2={x(rows[active].label)} y1="20" y2={height-30} stroke="var(--m-line-strong)"/>}{rows.map((d,i)=><g key={d.label} onPointerMove={()=>setActive(i)} onFocus={()=>setActive(i)}><Mark index={i} title={d.label} detail={format(d.value)} search={d.search}><circle cx={x(d.label)} cy={y(d.value)} r="14" fill="transparent"/><circle cx={x(d.label)} cy={y(d.value)} r="4" fill="var(--m-data-1)" stroke="var(--m-bg)" strokeWidth="2"/></Mark>{i===rows.length-1&&<text x={(x(d.label)??0)+12} y={y(d.value)+4} className="text-tick">{format(d.value)}</text>}</g>)}<Axis ticks={rows.filter((_,i)=>i%interval===0).map(d=>({x:x(d.label)??48,label:d.label}))} y={height-4}/></svg></div>;}
+import { useState } from 'react';
+import { scaleLinear, scalePoint } from 'd3-scale';
+import { line, curveMonotoneX } from 'd3-shape';
+import { Axis, Grid, Mark, useSize } from './primitives';
+import type { Search } from '@/lib/search';
+export function LineChart({
+  rows,
+  label,
+  format,
+}: {
+  rows: { label: string; value: number; search: Search }[];
+  label: string;
+  format: (n: number) => string;
+}) {
+  const { ref, width } = useSize(),
+    [active, setActive] = useState<number | null>(null),
+    height = 260,
+    max = Math.max(0, ...rows.map((v) => v.value)) || 1,
+    y = scaleLinear()
+      .domain([0, max])
+      .nice(3)
+      .range([height - 30, 30]),
+    x = scalePoint()
+      .domain(rows.map((v) => v.label))
+      .range([48, width - 80]),
+    path = line<(typeof rows)[number]>()
+      .x((d) => x(d.label) ?? 48)
+      .y((d) => y(d.value))
+      .curve(curveMonotoneX)(rows),
+    interval = Math.max(1, Math.ceil(rows.length / (width < 500 ? 4 : 10)));
+  return (
+    <div ref={ref} onPointerLeave={() => setActive(null)}>
+      <svg width={width} height={height} aria-label={label}>
+        <Grid
+          ticks={y.ticks(3)}
+          width={width}
+          height={height}
+          format={format}
+        />
+        {path && (
+          <path d={path} fill="none" stroke="var(--m-data-1)" strokeWidth="2" />
+        )}
+        {active !== null && rows[active] && (
+          <line
+            x1={x(rows[active].label)}
+            x2={x(rows[active].label)}
+            y1="20"
+            y2={height - 30}
+            stroke="var(--m-line-strong)"
+          />
+        )}
+        {rows.map((d, i) => (
+          <g
+            key={d.label}
+            onPointerMove={() => setActive(i)}
+            onFocus={() => setActive(i)}
+          >
+            <Mark
+              index={i}
+              title={d.label}
+              detail={format(d.value)}
+              search={d.search}
+            >
+              <circle
+                cx={x(d.label)}
+                cy={y(d.value)}
+                r="14"
+                fill="transparent"
+              />
+              <circle
+                cx={x(d.label)}
+                cy={y(d.value)}
+                r="4"
+                fill="var(--m-data-1)"
+                stroke="var(--m-bg)"
+                strokeWidth="2"
+              />
+            </Mark>
+            {i === rows.length - 1 && (
+              <text
+                x={(x(d.label) ?? 0) + 12}
+                y={y(d.value) + 4}
+                className="text-tick"
+              >
+                {format(d.value)}
+              </text>
+            )}
+          </g>
+        ))}
+        <Axis
+          ticks={rows
+            .filter((_, i) => i % interval === 0)
+            .map((d) => ({ x: x(d.label) ?? 48, label: d.label }))}
+          y={height - 4}
+        />
+      </svg>
+    </div>
+  );
+}

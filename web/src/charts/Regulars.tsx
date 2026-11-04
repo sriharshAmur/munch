@@ -1,10 +1,138 @@
-import {Link} from '@tanstack/react-router';
-import {scaleLinear} from 'd3-scale';
-import {regulars} from '@core/analyze/regulars';
-import {range,weekdays} from '@core/analyze/shared';
-import type {Order} from '@core/schema';
-import {date,plural,percent,time} from '@/lib/format';
-import {useFilters} from '@/lib/search';
-import {Chapter,Figure,Mark,useSize} from './primitives';
-export function Lifetime({visits,first,last}:{visits:string[];first:string;last:string}){const {ref,width}=useSize(),x=scaleLinear().domain([Date.parse(first),Math.max(Date.parse(last),Date.parse(first)+1)]).range([1,width-1]);return <div ref={ref}><svg width={width} height="18" aria-label="Every visit on a lifetime strip"><line x1="0" x2={width} y1="9" y2="9" stroke="var(--m-line)"/>{visits.map((v,i)=><line key={i} x1={x(Date.parse(v))} x2={x(Date.parse(v))} y1="3" y2="15" stroke="var(--m-data-1)" strokeWidth="1"/>)}</svg></div>;}
-export function RegularsChapter({orders}:{orders:Order[]}){const data=regulars(orders),filters=useFilters(),r=range(orders),max=data.places[0]?.count??1;return <Chapter id="your-regulars" title="Your regulars" lede={<>Three restaurants account for {percent(data.topThreeShare)} of your orders. {data.places[0]?.name??'Your usual'} leads with {plural(data.places[0]?.count??0,'visit')}.</>}><Figure caption="Your ten most-ordered restaurants. Each tick below a bar is another time you came back. Open a place to see every visit." headers={['Restaurant','Orders','Your usual','First','Last']} rows={data.places.map(p=>[p.name,p.count,p.usual,p.first?date(p.first):'',p.last?date(p.last):''])}><ol className="regular-list">{data.places.slice(0,10).map((p,i)=><li key={p.id}><div className="regular-heading"><Link to="/places" search={{...filters,place:p.id}}>{p.name}</Link><span>{plural(p.count,'order')}</span></div><svg viewBox="0 0 1000 28" height="24" width="100%" aria-label={`${p.name}: ${p.count} orders`}><Mark index={i} title={p.name} detail={plural(p.count,'order')} search={{restaurant:p.id}}><rect width="1000" height="28" fill="transparent"/><rect width={Math.max(4,p.count/max*1000)} height="18" y="5" rx="4" fill={i===0?'var(--m-data-1)':'var(--m-muted)'}/></Mark></svg><Lifetime visits={p.visits} first={r.first??''} last={r.last??''}/><p>Usually {weekdays[p.typical.weekday]} around {time(p.typical.hour)}, mostly {p.usual.toLowerCase()}.</p></li>)}</ol></Figure></Chapter>;}
+import { Link } from '@tanstack/react-router';
+import { scaleLinear } from 'd3-scale';
+import { regulars } from '@core/analyze/regulars';
+import { range, weekdays, local } from '@core/analyze/shared';
+import type { Order } from '@core/schema';
+import { date, plural, percent, time } from '@/lib/format';
+import { useFilters } from '@/lib/search';
+import { Chapter, Figure, Mark, useSize, Interactive } from './primitives';
+export function Lifetime({
+  visits,
+  first,
+  last,
+}: {
+  visits: string[];
+  first: string;
+  last: string;
+}) {
+  const { ref, width } = useSize(),
+    x = scaleLinear()
+      .domain([
+        Date.parse(first),
+        Math.max(Date.parse(last), Date.parse(first) + 1),
+      ])
+      .range([1, width - 1]);
+  return (
+    <div ref={ref}>
+      <Interactive>
+        <svg
+          width={width}
+          height="18"
+          aria-label="Every visit on a lifetime strip"
+        >
+          <line x1="0" x2={width} y1="9" y2="9" stroke="var(--m-line)" />
+          {visits.map((v, i) => (
+            <Mark
+              key={i}
+              index={i}
+              title={date(v, true)}
+              detail={`Order at ${time(local(v).hour)}`}
+              search={{ date: local(v).date }}
+            >
+              <rect
+                x={x(Date.parse(v)) - 4}
+                y="0"
+                width="8"
+                height="18"
+                fill="transparent"
+              />
+              <line
+                x1={x(Date.parse(v))}
+                x2={x(Date.parse(v))}
+                y1="3"
+                y2="15"
+                stroke="var(--m-data-1)"
+                strokeWidth="1"
+              />
+            </Mark>
+          ))}
+        </svg>
+      </Interactive>
+    </div>
+  );
+}
+export function RegularsChapter({ orders }: { orders: Order[] }) {
+  const data = regulars(orders),
+    filters = useFilters(),
+    r = range(orders),
+    max = data.places[0]?.count ?? 1;
+  return (
+    <Chapter
+      id="your-regulars"
+      title="Your regulars"
+      lede={
+        <>
+          Three restaurants account for {percent(data.topThreeShare)} of your
+          orders. {data.places[0]?.name ?? 'Your usual'} leads with{' '}
+          {plural(data.places[0]?.count ?? 0, 'visit')}.
+        </>
+      }
+    >
+      <Figure
+        caption="Your ten most-ordered restaurants. Each tick below a bar is another time you came back. Open a place to see every visit."
+        headers={['Restaurant', 'Orders', 'Your usual', 'First', 'Last']}
+        rows={data.places.map((p) => [
+          p.name,
+          p.count,
+          p.usual,
+          p.first ? date(p.first) : '',
+          p.last ? date(p.last) : '',
+        ])}
+      >
+        <ol className="regular-list">
+          {data.places.slice(0, 10).map((p, i) => (
+            <li key={p.id}>
+              <div className="regular-heading">
+                <Link to="/places" search={{ ...filters, place: p.id }}>
+                  {p.name}
+                </Link>
+                <span>{plural(p.count, 'order')}</span>
+              </div>
+              <svg
+                viewBox="0 0 1000 28"
+                height="24"
+                width="100%"
+                aria-label={`${p.name}: ${p.count} orders`}
+              >
+                <Mark
+                  index={i}
+                  title={p.name}
+                  detail={plural(p.count, 'order')}
+                  search={{ restaurant: p.id }}
+                >
+                  <rect width="1000" height="28" fill="transparent" />
+                  <rect
+                    width={Math.max(4, (p.count / max) * 1000)}
+                    height="18"
+                    y="5"
+                    rx="4"
+                    fill={i === 0 ? 'var(--m-data-1)' : 'var(--m-muted)'}
+                  />
+                </Mark>
+              </svg>
+              <Lifetime
+                visits={p.visits}
+                first={r.first ?? ''}
+                last={r.last ?? ''}
+              />
+              <p>
+                Usually {weekdays[p.typical.weekday]} around{' '}
+                {time(p.typical.hour)}, mostly {p.usual.toLowerCase()}.
+              </p>
+            </li>
+          ))}
+        </ol>
+      </Figure>
+    </Chapter>
+  );
+}

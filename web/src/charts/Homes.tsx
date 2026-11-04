@@ -1,11 +1,128 @@
-import {useState} from 'react';
-import {homes} from '@core/analyze/homes';
-import {weekdays} from '@core/analyze/shared';
-import type {Order} from '@core/schema';
-import {date,euros,time,plural} from '@/lib/format';
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input';
-import {Chapter,Figure,hrefFor} from './primitives';
-import {useFilters} from '@/lib/search';
-function HomePanel({home:h}:{home:ReturnType<typeof homes>[number]}){const [name,setName]=useState(()=>localStorage.getItem(`munch-home-${h.key}`)??`Home ${h.key}`),[editing,setEditing]=useState(false),[draft,setDraft]=useState(name),filters=useFilters();return <div className="home-panel"><div className="home-heading"><h3>{name}</h3><Button variant="ghost" size="sm" onClick={()=>{setDraft(name);setEditing(v=>!v);}}>Rename</Button></div>{editing&&<form onSubmit={e=>{e.preventDefault();const value=draft.trim()||`Home ${h.key}`;localStorage.setItem(`munch-home-${h.key}`,value);setName(value);setEditing(false);}}><Input value={draft} maxLength={60} aria-label="Home name" onChange={e=>setDraft(e.target.value)}/><Button type="submit">Save name</Button></form>}<p className="home-city">{h.city}</p><p className="home-dates">{h.first?date(h.first):''} to {h.last?date(h.last):''}</p><p className="home-rate"><strong className="text-stat">{h.ordersPerWeek.toFixed(1)}</strong> orders a week</p><dl><div><dt>Your regular</dt><dd>{h.restaurant}</dd></div><div><dt>Most often</dt><dd>{h.cuisine}</dd></div><div><dt>Your usual time</dt><dd>{weekdays[h.typical.weekday]} around {time(h.typical.hour)}</dd></div><div><dt>Average basket</dt><dd>{euros(h.averageOrder)}</dd></div></dl><a href={hrefFor({...filters,home:h.key})}>{plural(h.count,'order')} at this home</a></div>;}
-export function HomesChapter({orders}:{orders:Order[]}){const h=homes(orders),most=[...h].sort((a,b)=>b.ordersPerWeek-a.ordersPerWeek)[0];return <Chapter id="homes" title="Homes" lede={h.length>1?<>Different home, different usual. You ordered most often in {most?.city}, at {most?.ordersPerWeek.toFixed(1)} orders a week.</>:<>One delivery area, {plural(h[0]?.count??0,'order')}. Your usual there is {h[0]?.restaurant??'still taking shape'}.</>}><Figure caption="A home is a coarse postcode area and city. Rename it here to call it what you call it. Names are kept in this browser." headers={['Home','City','Orders','Orders a week','Average']} rows={h.map(v=>[`Home ${v.key}`,v.city,v.count,v.ordersPerWeek.toFixed(1),euros(v.averageOrder)])}><div className="home-panels">{h.map(home=><HomePanel key={home.key} home={home}/>)}</div></Figure></Chapter>;}
+import { useData } from '@/data/provider';
+import { useState } from 'react';
+import { homes } from '@core/analyze/homes';
+import { weekdays } from '@core/analyze/shared';
+import type { Order } from '@core/schema';
+import { date, euros, time, plural } from '@/lib/format';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Chapter, Figure, hrefFor } from './primitives';
+import { useFilters } from '@/lib/search';
+function HomePanel({ home: h }: { home: ReturnType<typeof homes>[number] }) {
+  const { state } = useData(),
+    storageKey = `munch-home-${state.kind === 'ready' && state.demo ? 'demo' : 'local'}-${h.key}`;
+  const [name, setName] = useState(
+      () => localStorage.getItem(storageKey) ?? `Home ${h.key}`,
+    ),
+    [editing, setEditing] = useState(false),
+    [draft, setDraft] = useState(name),
+    filters = useFilters();
+  return (
+    <div className="home-panel">
+      <div className="home-heading">
+        <h3>{name}</h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setDraft(name);
+            setEditing((v) => !v);
+          }}
+        >
+          Rename
+        </Button>
+      </div>
+      {editing && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const value = draft.trim() || `Home ${h.key}`;
+            localStorage.setItem(storageKey, value);
+            setName(value);
+            setEditing(false);
+          }}
+        >
+          <Input
+            value={draft}
+            maxLength={60}
+            aria-label="Home name"
+            onChange={(e) => setDraft(e.target.value)}
+          />
+          <Button type="submit">Save name</Button>
+        </form>
+      )}
+      <p className="home-city">{h.city}</p>
+      <p className="home-dates">
+        {h.first ? date(h.first) : ''} to {h.last ? date(h.last) : ''}
+      </p>
+      <p className="home-rate">
+        <strong className="text-stat">{h.ordersPerWeek.toFixed(1)}</strong>{' '}
+        orders a week
+      </p>
+      <dl>
+        <div>
+          <dt>Your regular</dt>
+          <dd>{h.restaurant}</dd>
+        </div>
+        <div>
+          <dt>Most often</dt>
+          <dd>{h.cuisine}</dd>
+        </div>
+        <div>
+          <dt>Your usual time</dt>
+          <dd>
+            {weekdays[h.typical.weekday]} around {time(h.typical.hour)}
+          </dd>
+        </div>
+        <div>
+          <dt>Average basket</dt>
+          <dd>{euros(h.averageOrder)}</dd>
+        </div>
+      </dl>
+      <a href={hrefFor({ ...filters, home: h.key })}>
+        {plural(h.count, 'order')} at this home
+      </a>
+    </div>
+  );
+}
+export function HomesChapter({ orders }: { orders: Order[] }) {
+  const h = homes(orders),
+    most = [...h].sort((a, b) => b.ordersPerWeek - a.ordersPerWeek)[0];
+  return (
+    <Chapter
+      id="homes"
+      title="Homes"
+      lede={
+        h.length > 1 ? (
+          <>
+            Different home, different usual. You ordered most often in{' '}
+            {most?.city}, at {most?.ordersPerWeek.toFixed(1)} orders a week.
+          </>
+        ) : (
+          <>
+            One delivery area, {plural(h[0]?.count ?? 0, 'order')}. Your usual
+            there is {h[0]?.restaurant ?? 'still taking shape'}.
+          </>
+        )
+      }
+    >
+      <Figure
+        caption="A home is a coarse postcode area and city. Rename it here to call it what you call it. Names are kept in this browser."
+        headers={['Home', 'City', 'Orders', 'Orders a week', 'Average']}
+        rows={h.map((v) => [
+          `Home ${v.key}`,
+          v.city,
+          v.count,
+          v.ordersPerWeek.toFixed(1),
+          euros(v.averageOrder),
+        ])}
+      >
+        <div className="home-panels">
+          {h.map((home) => (
+            <HomePanel key={home.key} home={home} />
+          ))}
+        </div>
+      </Figure>
+    </Chapter>
+  );
+}

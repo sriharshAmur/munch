@@ -1,8 +1,72 @@
-import {useMemo} from 'react';
-import {predict,backtest} from '@core/predict';
-import {weekdays} from '@core/analyze/shared';
-import type {Order} from '@core/schema';
-import {date,percent,time} from '@/lib/format';
-import {Chapter,Figure,hrefFor} from './primitives';
-import {useFilters} from '@/lib/search';
-export function PredictionChapter({orders,now}:{orders:Order[];now:string}){const result=useMemo(()=>predict(orders,now),[orders,now]),score=useMemo(()=>backtest(orders),[orders]),filters=useFilters();const winner=result?.restaurants[0];return <Chapter id="next-order" title="Next order" lede={result&&winner?<>Next likely: {weekdays[result.window.weekday]} between {time(result.window.hour-1)} and {time(result.window.hour+1)}, probably {winner.name}.</>:'There are too few orders in this view for a useful guess. Ten or more will give it something to work with.'}>{result&&<Figure caption="This is a guess from recent habits. The weights below are relative scores, not calibrated probabilities. The backtest uses only orders that came before each guess." headers={['Restaurant','Relative weight']} rows={result.restaurants.map(r=>[r.name,percent(r.score)])}><div className="prediction-main"><span className="text-small">{date(result.window.time,true)}</span><p className="prediction-place">{winner?.name}</p><p className="text-body">Around {time(result.window.hour)}. Same taste, another evening.</p></div><ol className="runners">{result.restaurants.slice(1).map(r=><li key={r.id}><a href={hrefFor({...filters,restaurant:r.id})}>{r.name}</a><span>{percent(r.score)} relative weight</span></li>)}</ol><div className="backtest"><p className="text-body">On your last {score.tested} orders, this guessed the restaurant right {score.top1} times, and in its top three {score.top3} times. It guessed the day right {score.day} times.</p><p>{score.top1Rate<.5?'It misses more often than it gets the restaurant right. Treat it as a nudge, not a reservation.':'A familiar pattern is easier to guess. The next order can still surprise it.'}</p></div></Figure>}</Chapter>;}
+import { useMemo } from 'react';
+import { predict, backtest } from '@core/predict';
+import { weekdays } from '@core/analyze/shared';
+import type { Order } from '@core/schema';
+import { date, percent, time } from '@/lib/format';
+import { Chapter, Figure, hrefFor } from './primitives';
+import { useFilters } from '@/lib/search';
+export function PredictionChapter({
+  orders,
+  now,
+}: {
+  orders: Order[];
+  now: string;
+}) {
+  const result = useMemo(() => predict(orders, now), [orders, now]),
+    score = useMemo(() => backtest(orders), [orders]),
+    filters = useFilters();
+  const winner = result?.restaurants[0];
+  return (
+    <Chapter
+      id="next-order"
+      title="Next order"
+      lede={
+        result && winner ? (
+          <>
+            Next likely: {weekdays[result.window.weekday]} between{' '}
+            {time(result.window.hour - 1)} and {time(result.window.hour + 1)},
+            probably {winner.name}.
+          </>
+        ) : (
+          'There are too few orders in this view for a useful guess. Ten or more will give it something to work with.'
+        )
+      }
+    >
+      {result && (
+        <Figure
+          caption="This is a guess from recent habits. The weights below are relative scores, not calibrated probabilities. The backtest uses only orders that came before each guess."
+          headers={['Restaurant', 'Relative weight']}
+          rows={result.restaurants.map((r) => [r.name, percent(r.score)])}
+        >
+          <div className="prediction-main">
+            <span className="text-small">{date(result.window.time, true)}</span>
+            <p className="prediction-place">{winner?.name}</p>
+            <p className="text-body">
+              Around {time(result.window.hour)}. Same taste, another evening.
+            </p>
+          </div>
+          <ol className="runners">
+            {result.restaurants.slice(1).map((r) => (
+              <li key={r.id}>
+                <a href={hrefFor({ ...filters, restaurant: r.id })}>{r.name}</a>
+                <span>{percent(r.score)} relative weight</span>
+              </li>
+            ))}
+          </ol>
+          <div className="backtest">
+            <p className="text-body">
+              On your last {score.tested} orders, this guessed the restaurant
+              right {score.top1} times, and in its top three {score.top3} times.
+              It guessed the day right {score.day} times.
+            </p>
+            <p>
+              {score.top1Rate < 0.5
+                ? 'It misses more often than it gets the restaurant right. Treat it as a nudge, not a reservation.'
+                : 'A familiar pattern is easier to guess. The next order can still surprise it.'}
+            </p>
+          </div>
+        </Figure>
+      )}
+    </Chapter>
+  );
+}
