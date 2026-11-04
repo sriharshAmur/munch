@@ -149,3 +149,4 @@ Sri asked to show his local import and provide `orders.json` before continuing t
 - [x] Step 5.7: calendar, longest streak and longest pause
 - [x] Step 5.8: home comparisons and browser-only names
 - [x] Step 5.9: first-visit share with filtered-history context
+- [x] Step 5.10: costs, signed adjustments and monthly timing
