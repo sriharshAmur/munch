@@ -143,3 +143,4 @@ Sri asked to show his local import and provide `orders.json` before continuing t
 - [x] Step 5.1: the plate, Delaunay hover, keyboard exploration and chronological fill
 - [x] Step 5.2: weekly heatmap, quantile ramp, tooltips and number table
 - [x] Step 5.3: monthly orders and spend on separate scales
+- [x] Step 5.4: ranked regulars and every-visit lifetime strips
