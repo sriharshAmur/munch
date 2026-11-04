@@ -39,7 +39,7 @@ export function generateDemo(): OrdersFile {
    if(random()<.36) items.push({name:'Crispy vegetable side',quantity:1,unitPrice:375,total:375,options:[]});
    const food=items.reduce((s,i)=>s+i.total,0), pickup=random()<.08;
    const deliveryFee=pickup?0:Math.floor(random()*8)*50,serviceFee=year>=2022?75+Math.floor(random()*4)*25:0,smallOrderFee=food<1200?100:0,tip=random()<.34?Math.floor(random()*4+1)*50:0,discount=random()<.11?250:0;
-   orders.push({id:`demo:${orders.length+1}`,source:'demo',placedAt,deliveredAt:null,restaurant:{id:restaurant.id,name:restaurant.name,cuisines:restaurant.cuisines},fulfilment:pickup?'pickup':'delivery',group:group?{isGroup:true,groupSize}:{isGroup:false,groupSize:null},items,money:{items:food,deliveryFee,serviceFee,smallOrderFee,tip,discount,total:food+deliveryFee+serviceFee+smallOrderFee+tip-discount,currency:'EUR'},payment:random()<.85?'iDEAL':random()<.5?'Card':'PayPal',home:homes[homeIndex]??homes[0],status:random()<.01?'cancelled':'delivered'});
+   orders.push({id:`demo:${orders.length+1}`,source:'demo',placedAt,deliveredAt:null,restaurant:{id:restaurant.id,name:restaurant.name,cuisines:restaurant.cuisines},fulfilment:pickup?'pickup':'delivery',group:group?{isGroup:true,groupSize}:{isGroup:false,groupSize:null},items,money:{items:food,deliveryFee,serviceFee,smallOrderFee,tip,discount,adjustments:0,total:food+deliveryFee+serviceFee+smallOrderFee+tip-discount,currency:'EUR'},payment:random()<.85?'iDEAL':random()<.5?'Card':'PayPal',home:homes[homeIndex]??homes[0],status:random()<.01?'cancelled':'delivered'});
   }
  }
  return OrdersFileSchema.parse({version:1,source:'demo',generatedAt:DEMO_NOW,orders:orders.sort((a,b)=>a.placedAt.localeCompare(b.placedAt))});

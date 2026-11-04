@@ -15,7 +15,7 @@ import {cost} from './cost';
 import {local} from './shared';
 const demo=generateDemo().orders;
 const base=demo[0];if(!base)throw Error('Demo fixture is empty');
-const fake=(id:string,placedAt:string,overrides:Partial<Order>={}):Order=>({...base,id:`demo:${id}`,placedAt,status:'delivered',restaurant:{id:'a',name:'Imaginary Spoon',cuisines:['Thai']},money:{items:1000,deliveryFee:100,serviceFee:0,smallOrderFee:0,tip:0,discount:0,total:1100,currency:'EUR'},group:{isGroup:false,groupSize:null},...overrides});
+const fake=(id:string,placedAt:string,overrides:Partial<Order>={}):Order=>({...base,id:`demo:${id}`,placedAt,status:'delivered',restaurant:{id:'a',name:'Imaginary Spoon',cuisines:['Thai']},money:{items:1000,deliveryFee:100,serviceFee:0,smallOrderFee:0,tip:0,discount:0,adjustments:0,total:1100,currency:'EUR'},group:{isGroup:false,groupSize:null},...overrides});
 const a=fake('a','2024-01-01T23:30:00+00:00'),b=fake('b','2024-01-03T19:00:00+01:00'),c=fake('c','2024-01-04T20:00:00+01:00',{restaurant:{id:'b',name:'Invented Rice',cuisines:['Sushi']},group:{isGroup:true,groupSize:3}}),cancelled=fake('x','2023-01-01T10:00:00+01:00',{status:'cancelled'});
 const small=[a,b,c,cancelled];
 test('timeline includes empty months and sums each month once',()=>{const t=timeline([a,fake('later','2024-03-01T19:00:00+01:00')]);expect(t.months.map(m=>m.count)).toEqual([1,0,1]);expect(t.months[0]?.spend).toBe(1100);});
