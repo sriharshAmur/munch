@@ -142,3 +142,4 @@ README in the style of Long Exposure's (what you get, getting your orders, your 
 Sri asked to show his local import and provide `orders.json` before continuing the chapters. A temporary import summary and order lists are in place. The captured detail can be rebuilt and checked. Full-history fetching remains blocked by the website rejecting the copied session. Steps 5, 6, 7 and 8 are not marked complete.
 - [x] Step 5.1: the plate, Delaunay hover, keyboard exploration and chronological fill
 - [x] Step 5.2: weekly heatmap, quantile ramp, tooltips and number table
+- [x] Step 5.3: monthly orders and spend on separate scales
