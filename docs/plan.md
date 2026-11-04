@@ -135,3 +135,4 @@ README in the style of Long Exposure's (what you get, getting your orders, your 
 - [x] Step 1: generated tokens, semantic theme mapping and fonts
 - [x] Step 2: validated schema and repeatable demo person
 - [x] Step 3: pure analysis modules and prediction with behaviour tests
+- [x] Step 4: file loading, routes, shared filters and app shell
