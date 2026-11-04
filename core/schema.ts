@@ -1,0 +1,12 @@
+import { z } from 'zod';
+const cents = z.number().int().nonnegative();
+export const MoneySchema = z.object({ items:cents, deliveryFee:cents, serviceFee:cents, smallOrderFee:cents, tip:cents, discount:cents, total:cents, currency:z.literal('EUR') });
+export const HomeSchema = z.object({ key:z.string().min(1), postcode:z.string().regex(/^\d{4}$/), city:z.string().min(1) });
+export const OrderItemSchema = z.object({ name:z.string().min(1), quantity:z.number().int().positive(), unitPrice:cents, total:cents, options:z.array(z.string()) });
+export const OrderSchema = z.object({ id:z.string().regex(/^[a-z]+:.+$/), source:z.string().min(1), placedAt:z.iso.datetime({ offset:true }), deliveredAt:z.iso.datetime({ offset:true }).nullable(), restaurant:z.object({ id:z.string().min(1), name:z.string().min(1), cuisines:z.array(z.string()).min(1) }), fulfilment:z.enum(['delivery','pickup']), group:z.discriminatedUnion('isGroup',[z.object({isGroup:z.literal(false),groupSize:z.null()}),z.object({isGroup:z.literal(true),groupSize:z.number().int().min(2).nullable()})]), items:z.array(OrderItemSchema).min(1), money:MoneySchema, payment:z.string().nullable(), home:HomeSchema, status:z.enum(['delivered','cancelled','unknown']) });
+export const OrdersFileSchema = z.object({ version:z.literal(1), source:z.string(), generatedAt:z.iso.datetime({offset:true}), orders:z.array(OrderSchema) });
+export type Money = z.infer<typeof MoneySchema>;
+export type Home = z.infer<typeof HomeSchema>;
+export type OrderItem = z.infer<typeof OrderItemSchema>;
+export type Order = z.infer<typeof OrderSchema>;
+export type OrdersFile = z.infer<typeof OrdersFileSchema>;
