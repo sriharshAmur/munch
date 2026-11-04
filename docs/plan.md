@@ -139,7 +139,7 @@ README in the style of Long Exposure's (what you get, getting your orders, your 
 
 ## Current priority
 
-Sri asked to show his local import and provide `orders.json` before continuing the chapters. A temporary import summary and order lists are in place. The captured detail can be rebuilt and checked. Full-history fetching remains blocked by the website rejecting the copied session. Steps 5, 6, 7 and 8 are not marked complete.
+Sri prioritised the local import before the chapters. The complete returned history is now fetched and validated, the story chapters and explorers are built, and the requested local export is available. The dev server remains running. No remote has been created or pushed.
 - [x] Step 5.1: the plate, Delaunay hover, keyboard exploration and chronological fill
 - [x] Step 5.2: weekly heatmap, quantile ramp, tooltips and number table
 - [x] Step 5.3: monthly orders and spend on separate scales
@@ -151,3 +151,8 @@ Sri asked to show his local import and provide `orders.json` before continuing t
 - [x] Step 5.9: first-visit share with filtered-history context
 - [x] Step 5.10: costs, signed adjustments and monthly timing
 - [x] Step 5.11: next order, runner-ups and past-only backtest
+- [x] Step 5.12: closing link to every order
+- [x] Step 6: searchable sortable explorers, filters, virtual rows and detail sheets
+- [x] Step 7: cURL parsing, redacted probes, polite requests and validation
+- [x] Step 8: complete history fetch, normalisation and issue checklist update
+- [x] Step 9: README, demo screenshots, MIT licence and static demo build
