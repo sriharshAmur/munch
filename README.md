@@ -8,7 +8,7 @@ Munch turns your food delivery history into a story. See when you order, the res
 
 ## What you get
 
-- A plate of every order. Time of day runs around the rim; dates run from the centre to the edge. Hover a dot or use the arrow keys to open an order.
+- A plate of every order. Time of day runs around the rim; dates run from the centre to the edge. Hover a dot or use the arrow keys to open an order. Replay your dinners, spotlight your usual or late orders, and pick a random receipt.
 - Your week as a heatmap, monthly ordering and spend, restaurant lifetimes, dishes and cuisine mix.
 - Solo and group orders, streaks and gaps, homes, first visits and the parts of an order's cost.
 - A next-order guess with a backtest that says how often it got the restaurant and day right.
@@ -38,7 +38,7 @@ bun run munch build
 bun run munch check
 ```
 
-The probe writes a redacted shape for parser development. Fetching follows the website's next-page links, one request at a time, and saves responses locally. Repeated fetches stop at an order already stored. `bun run munch fetch --full` refreshes the complete history. Building runs locally and never needs your session again.
+The probe writes a redacted shape for parser development. Fetching follows the website's next-page links, one request at a time, and saves responses locally. Repeated fetches stop at an order already stored. `bun run munch fetch --full` refreshes every order in the returned listing. Reaching its end does not prove it includes your whole account history; an account data export is the fallback for older orders. Building runs locally and never needs your session again.
 
 A rejected session stops the run. Copy a fresh request before trying again. If the website changes, the importer stops with field names and keeps the previous built file. The account data download is the fallback if the customer website becomes unreliable.
 
@@ -46,7 +46,7 @@ A rejected session stops the run. Copy a fresh request before trying again. If t
 
 Nothing is uploaded by the app. Fonts are self-hosted. Private responses, exports, copied requests and normalised orders are ignored by git. The dev server listens on this machine's loopback address.
 
-The normalised file keeps the information needed for the story. It drops names, email addresses, phone numbers and street addresses. Homes use only a coarse postcode area and city. An opened file is kept in this browser's IndexedDB; use **Forget my file** in the data menu to remove it.
+The normalised file keeps the information needed for the story. It drops names, email addresses, phone numbers and street addresses. Homes use a coarse postcode area, city and opaque key. The local importer also writes private street-and-number display labels to an ignored sidecar; those labels stay out of the order export and public build. You can rename any home in the browser. An opened file is kept in this browser's IndexedDB; use **Forget my file** in the data menu to remove it.
 
 The CLI keeps session headers in memory and never prints them. Do not paste a copied cURL into a chat, an issue or a commit.
 
@@ -74,6 +74,7 @@ All screenshots use the fictional demo.
 | --- | --- | --- |
 | Desktop | [1440px](docs/screenshots/story-1440-light.png) | [1440px](docs/screenshots/story-1440-dark.png) |
 | Phone | [375px](docs/screenshots/story-375-light.png) | [375px](docs/screenshots/story-375-dark.png) |
+| Homes | [1440px](docs/screenshots/homes-1440-light.png) | [1440px](docs/screenshots/homes-1440-dark.png) |
 
 ## Licence
 

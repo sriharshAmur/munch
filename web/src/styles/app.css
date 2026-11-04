@@ -1252,3 +1252,207 @@ svg text {
 .dish-list a:hover {
   color: var(--m-accent-ink);
 }
+
+.plate-controls {
+  margin: 24px 0 20px;
+}
+.plate-controls [data-slot='toggle-group'] {
+  width: 100%;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--m-line);
+  border-radius: 9999px;
+}
+.plate-controls [data-slot='toggle-group-item'] {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 9999px;
+  font-size: 14px;
+}
+.plate-controls [data-state='on'] {
+  background: var(--m-accent-soft);
+  color: var(--m-accent-ink);
+}
+.plate-lens-finding {
+  margin-top: 12px;
+  font: 16px/1.5 var(--font-text);
+  color: var(--m-ink-soft);
+  overflow-wrap: anywhere;
+}
+.plate-transport {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+.plate-transport > [data-slot='button']:first-child {
+  flex-shrink: 0;
+  width: 44px;
+}
+.plate-scrubber {
+  flex: 1;
+  min-width: 0;
+}
+.plate-scrubber [data-slot='slider'] {
+  height: 24px;
+}
+.plate-scrubber > span {
+  color: var(--m-ink-faint);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.plate-shuffle {
+  color: var(--m-accent-ink);
+  font-size: 14px;
+  padding: 8px;
+}
+.dinner-ticket {
+  position: relative;
+  padding: 20px 24px;
+  border: 1px solid var(--m-line);
+  border-radius: 6px;
+  background: var(--m-surface);
+  min-width: 0;
+}
+.dinner-ticket::before,
+.dinner-ticket::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  top: 22px;
+  border: 1px solid var(--m-line);
+  border-radius: 50%;
+  background: var(--m-bg);
+}
+.dinner-ticket::before {
+  left: -7px;
+  border-left-color: transparent;
+}
+.dinner-ticket::after {
+  right: -7px;
+  border-right-color: transparent;
+}
+.ticket-top,
+.ticket-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.ticket-top {
+  color: var(--m-ink-faint);
+  font-size: 13px;
+  margin-bottom: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.ticket-main {
+  align-items: baseline;
+  padding-top: 12px;
+  border-top: 1px solid var(--m-line);
+}
+.ticket-main strong {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.2;
+  min-height: 48px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.ticket-main > span {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.dinner-ticket > p {
+  font: 15px/1.5 var(--font-text);
+  color: var(--m-ink-soft);
+  margin: 8px 0;
+  min-height: 45px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.dinner-ticket > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--m-accent-ink);
+  text-underline-offset: 4px;
+  font-size: 14px;
+}
+.home-doorstep {
+  display: block;
+  max-width: 240px;
+  margin: -8px auto 24px;
+}
+.home-doorstep svg {
+  display: block;
+  width: 100%;
+}
+.home-doorstep:hover .door-fill,
+.home-doorstep:focus-visible .door-fill {
+  fill: var(--m-accent-soft);
+  stroke: var(--m-accent-ink);
+}
+.home-bands {
+  flex-wrap: wrap;
+}
+.home-bands span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .plate-transport {
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .plate-scrubber {
+    min-width: 100px;
+  }
+  .plate-shuffle {
+    margin-left: auto;
+  }
+  .dinner-ticket {
+    padding: 16px 20px;
+  }
+  .ticket-top {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+}
+.story-hero {
+  align-items: start;
+}
+.hero-copy {
+  padding-top: 72px;
+}
+.plate-scrubber [data-slot='slider-track'] {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--m-raised);
+}
+.plate-scrubber [data-slot='slider-range'] {
+  position: absolute;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--m-accent);
+}
+.plate-scrubber [data-slot='slider-thumb'] {
+  width: 16px;
+  height: 16px;
+  background: var(--m-surface);
+  border: 1.5px solid var(--m-accent-ink);
+  border-radius: 50%;
+}
+@media (max-width: 760px) {
+  .hero-copy {
+    padding-top: 0;
+  }
+}

@@ -20,7 +20,6 @@ import { NoveltyChapter } from '@/charts/Novelty';
 import { CostChapter } from '@/charts/Cost';
 import { PredictionChapter } from '@/charts/Prediction';
 import { Plate } from '@/charts/Plate';
-import { Figure } from '@/charts/primitives';
 export function Story() {
   const { state } = useData(),
     filters = useFilters();
@@ -74,61 +73,43 @@ export function Story() {
       }
       data-order-count={orders.length}
     >
-      <section className="story-hero">
-        <div className="hero-copy">
-          <h1 className="text-display">
-            {number(s.count)} {s.count === 1 ? 'order' : 'orders'}
-            <br />
-            since {s.first ? month(s.first) : 'the beginning'}.
-          </h1>
-          <p className="text-lede">
-            {s.count < 5 ? (
-              `${s.count} orders so far. A little more history will tell a fuller story.`
-            ) : (
-              <>
-                Your busiest hour is {weekdays[r.peak.weekday]} at{' '}
-                {time(r.peak.hour)}. A taste for{' '}
-                {top?.toLowerCase() ?? 'your usual'}, and{' '}
-                {percent(findings.regulars.topThreeShare)} of your orders from
-                just three places.
-              </>
-            )}
-          </p>
-          <div className="hero-meta">
-            <span>{s.restaurants} restaurants</span>
-            <span>
-              {new Set(orders.map((o) => o.home.key)).size}{' '}
-              {new Set(orders.map((o) => o.home.key)).size === 1
-                ? 'home'
-                : 'homes'}
-            </span>
-            <span>One dot, one dinner.</span>
-          </div>
+      <Plate
+        orders={orders}
+        key={[
+          filters.year,
+          filters.home,
+          state.kind === 'ready' ? state.file.generatedAt : '',
+        ].join('|')}
+      >
+        <h1 className="text-display">
+          {number(s.count)} {s.count === 1 ? 'order' : 'orders'}
+          <br />
+          since {s.first ? month(s.first) : 'the beginning'}.
+        </h1>
+        <p className="text-lede">
+          {s.count < 5 ? (
+            `${s.count} orders so far. A little more history will tell a fuller story.`
+          ) : (
+            <>
+              Your busiest hour is {weekdays[r.peak.weekday]} at{' '}
+              {time(r.peak.hour)}. A taste for{' '}
+              {top?.toLowerCase() ?? 'your usual'}, and{' '}
+              {percent(findings.regulars.topThreeShare)} of your orders from
+              just three places.
+            </>
+          )}
+        </p>
+        <div className="hero-meta">
+          <span>{s.restaurants} restaurants</span>
+          <span>
+            {new Set(orders.map((o) => o.home.key)).size}{' '}
+            {new Set(orders.map((o) => o.home.key)).size === 1
+              ? 'home'
+              : 'homes'}
+          </span>
+          <span>One dot, one dinner.</span>
         </div>
-        <div className="hero-figure">
-          <Figure
-            caption="Time of day around the rim. Your first order at the centre, your latest at the edge."
-            headers={['Date', 'Restaurant', 'Total']}
-            rows={orders.map((o) => [
-              o.placedAt,
-              o.restaurant.name,
-              (o.money.total / 100).toFixed(2),
-            ])}
-          >
-            <Plate orders={orders} />
-            <div className="legend">
-              <span>
-                <i />
-                On your own
-              </span>
-              <span>
-                <i className="group" />
-                Group order
-              </span>
-            </div>
-          </Figure>
-        </div>
-      </section>
+      </Plate>
       <nav className="story-index" aria-label="In your story">
         <a href="#your-week">Your week</a>
         <a href="#the-years">The years</a>

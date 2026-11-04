@@ -139,7 +139,7 @@ README in the style of Long Exposure's (what you get, getting your orders, your 
 
 ## Current priority
 
-Sri prioritised the local import before the chapters. The complete returned history is now fetched and validated, the story chapters and explorers are built, and the requested local export is available. The dev server remains running. No remote has been created or pushed.
+Sri prioritised the local import before the chapters. The returned listing is fetched and validated, the story chapters and explorers are built, and the requested local export is available. Reaching the last returned page does not establish that older account history is included. The dev server remains running. No remote has been created or pushed.
 - [x] Step 5.1: the plate, Delaunay hover, keyboard exploration and chronological fill
 - [x] Step 5.2: weekly heatmap, quantile ramp, tooltips and number table
 - [x] Step 5.3: monthly orders and spend on separate scales
@@ -154,5 +154,12 @@ Sri prioritised the local import before the chapters. The complete returned hist
 - [x] Step 5.12: closing link to every order
 - [x] Step 6: searchable sortable explorers, filters, virtual rows and detail sheets
 - [x] Step 7: cURL parsing, redacted probes, polite requests and validation
-- [x] Step 8: complete history fetch, normalisation and issue checklist update
+- [x] Step 8: returned listing fetch, normalisation and issue checklist update
 - [x] Step 9: README, demo screenshots, MIT licence and static demo build
+
+## Local story refinements
+
+- [x] Separate doorsteps within a postcode and show privately stored street-and-number labels, as requested
+- [x] Add dinner replay, habit spotlights, a random dinner receipt and illustrated homes
+- [x] Check the refinements in both themes at phone and desktop sizes
+- [ ] Resolve history older than the website's returned listing using an observed browser request or account export
