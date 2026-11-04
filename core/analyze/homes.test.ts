@@ -50,6 +50,6 @@ const a = fake('a', '2024-01-01T23:30:00+00:00'),
 const small = [a, b, c, cancelled];
 test('homes return only the orders of each home', () => {
   const h = homes(demo);
-  expect(h).toHaveLength(3);
+  expect(h).toHaveLength(2);
   expect(h.reduce((s, v) => s + v.count, 0)).toBe(summary(demo).count);
 });

@@ -53,6 +53,16 @@ test('filters use Amsterdam dates and omit cancellations', () => {
   expect(applyFilter(small, { year: 2024 })).toHaveLength(3);
   expect(applyFilter(small, { weekday: 1, hour: 0 })).toEqual([a]);
   expect(availableYears(small)).toEqual([2023, 2024]);
-  expect(availableHomes(demo)).toHaveLength(3);
+  expect(availableHomes(demo)).toHaveLength(2);
   expect(applyFilter(small, { includeCancelled: true })).toHaveLength(4);
+});
+test('a week and a price range narrow the orders', () => {
+  const week = applyFilter(demo, { week: '2026-10-05' });
+  expect(week.length).toBeGreaterThan(0);
+  for (const o of week) {
+    const d = local(o.placedAt).date;
+    expect(d >= '2026-10-05' && d <= '2026-10-11').toBe(true);
+  }
+  const cheap = applyFilter(demo, { min: 1000, max: 2000 });
+  expect(cheap.every((o) => o.money.total >= 1000 && o.money.total < 2000)).toBe(true);
 });

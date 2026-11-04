@@ -46,8 +46,10 @@ export function calendar(orders: Order[]) {
   ].map(([start, v]) => ({ start, count: v.reduce((s, d) => s + d.count, 0) }));
   return {
     days,
+    /** Monday-first weeks, oldest first, empty weeks included. */
+    weeks,
     streak,
     gap,
-    busiestWeek: weeks.sort((a, b) => b.count - a.count)[0] ?? null,
+    busiestWeek: [...weeks].sort((a, b) => b.count - a.count)[0] ?? null,
   };
 }

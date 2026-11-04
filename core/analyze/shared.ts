@@ -19,7 +19,27 @@ const formatter = new Intl.DateTimeFormat('en-GB', {
   weekday: 'long',
   hourCycle: 'h23',
 });
-export function local(iso: string) {
+export type LocalParts = {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  weekday: number;
+  date: string;
+};
+// Formatting a date in Amsterdam time is slow and every analysis asks for the same
+// orders many times over, so the parts are remembered per timestamp.
+const cache = new Map<string, LocalParts>();
+export function local(iso: string): LocalParts {
+  const known = cache.get(iso);
+  if (known) return known;
+  const parts = parse(iso);
+  if (cache.size > 50000) cache.clear();
+  cache.set(iso, parts);
+  return parts;
+}
+function parse(iso: string): LocalParts {
   const p = formatter.formatToParts(new Date(iso));
   const get = (type: Intl.DateTimeFormatPartTypes) =>
     p.find((v) => v.type === type)?.value ?? '';

@@ -9,6 +9,11 @@ export type OrderFilter = {
   hour?: number;
   month?: string;
   date?: string;
+  /** The Monday a week starts on, "2026-03-02". */
+  week?: string;
+  /** Order totals in cents, from min up to but not including max. */
+  min?: number;
+  max?: number;
   fulfilment?: string;
   company?: string;
 };
@@ -23,11 +28,18 @@ export function applyFilter(orders: Order[], filter: OrderFilter = {}) {
       (filter.hour === undefined || p.hour === filter.hour) &&
       (!filter.month || p.date.startsWith(filter.month)) &&
       (!filter.date || p.date === filter.date) &&
+      (!filter.week || inWeek(p.date, filter.week)) &&
+      (filter.min === undefined || o.money.total >= filter.min) &&
+      (filter.max === undefined || o.money.total < filter.max) &&
       (!filter.fulfilment || o.fulfilment === filter.fulfilment) &&
       (!filter.company || (filter.company === 'group') === o.group.isGroup)
     );
   });
 }
+const inWeek = (date: string, monday: string) => {
+  const days = (Date.parse(date) - Date.parse(monday)) / 86400000;
+  return days >= 0 && days < 7;
+};
 export const availableYears = (orders: Order[]) =>
   [...new Set(orders.map((o) => local(o.placedAt).year))].sort((a, b) => a - b);
 export const availableHomes = (orders: Order[]) => [

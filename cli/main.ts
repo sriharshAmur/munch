@@ -77,6 +77,14 @@ try {
       process.stdout.write(
         `Orders: ${orders.length}\nYears represented: ${years.size}\nDuplicates: ${orders.length - ids.size}\nMoney problems: ${balances}\nMissing fields: 0\n`,
       );
+      if (Bun.argv.includes('--coverage')) {
+        const { coverage } = await import('./coverage');
+        process.stdout.write(
+          `\nCoverage (counts only)\n${Object.entries(coverage(orders))
+            .map(([label, n]) => `${label}: ${n}`)
+            .join('\n')}\n`,
+        );
+      }
       if (balances || ids.size !== orders.length) process.exitCode = 1;
     }
   } else if (command === 'build') {
