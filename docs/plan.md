@@ -134,3 +134,4 @@ README in the style of Long Exposure's (what you get, getting your orders, your 
 - [x] Step 0: scaffold, dependencies, shadcn components and running dev server
 - [x] Step 1: generated tokens, semantic theme mapping and fonts
 - [x] Step 2: validated schema and repeatable demo person
+- [x] Step 3: pure analysis modules and prediction with behaviour tests
