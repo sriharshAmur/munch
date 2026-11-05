@@ -99,6 +99,7 @@ export function Places() {
   );
   const returnFocus = useSheetReturnFocus(filters.place, () => search.current?.focus());
   const regulars = counts.regular;
+  const once = places.filter((p) => p.count === 1).length;
   return (
     <section className="explorer">
       <div className="explorer-heading">
@@ -106,7 +107,7 @@ export function Places() {
           <h1 className="text-title">Your places</h1>
           <p className="explorer-lede">
             {plural(places.length, 'restaurant')}.{' '}
-            {counts['one-time'] ? `${counts['one-time']} got a single try` : 'Every one got a second order'}
+            {once ? `${once} got a single try` : 'Every one got a second order'}
             {regulars ? `, ${regulars} ${regulars === 1 ? 'is a regular' : 'are regulars'}` : ''}
             {counts['gone-quiet'] ? `, and ${counts['gone-quiet']} went quiet` : ''}.
           </p>

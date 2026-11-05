@@ -440,9 +440,8 @@ summary {
   }
   .start-ticket {
     width: 240px;
-    left: 0;
-    top: 8px;
-    left: calc(var(--n) * 16%);
+    /* Never past the right edge, so the tilted ticket can't push a phone screen sideways. */
+    left: min(calc(var(--n) * 16%), calc(100% - 252px));
     top: calc(var(--n) * 20px);
   }
 }
@@ -668,7 +667,8 @@ body:has(.landing) > #root footer:not([class]) {
 @media (max-width: 860px) {
   .tour-grid,
   .steps {
-    grid-template-columns: 1fr;
+    /* minmax(0, …): a long command line scrolls inside its block instead of widening the page. */
+    grid-template-columns: minmax(0, 1fr);
   }
   .tour,
   .how {

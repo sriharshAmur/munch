@@ -42,13 +42,18 @@ export function Home() {
         : '';
 
   if (!orders.length)
-    return (
+    return applyFilter(history).length ? (
       <article className="home home-empty" data-order-count={0}>
         <h1 className="text-title">No orders in this view.</h1>
         <p className="text-lede">Pick another year or home. Your history is still here.</p>
         <Link to="/" search={{}}>
           Show all time
         </Link>
+      </article>
+    ) : (
+      <article className="home home-empty" data-order-count={0}>
+        <h1 className="text-title">This file has no orders to read.</h1>
+        <p className="text-lede">Run munch fetch and munch build again, then open data/orders.json.</p>
       </article>
     );
 

@@ -85,6 +85,8 @@ export function Start() {
           onChange={(e) => {
             const f = e.target.files?.[0];
             if (f) void openFile(f).then(() => navigate({ to: '/', search: {} }));
+            // So choosing the same file again, after a fresh munch build, still opens it.
+            e.target.value = '';
           }}
         />
         {state.kind === 'empty' && state.error && (

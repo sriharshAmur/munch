@@ -10,6 +10,7 @@ import { loadHomeNames } from './home-names';
 import { get, set, del } from 'idb-keyval';
 import { toast } from 'sonner';
 import { OrdersFileSchema, type OrdersFile } from '@core/schema';
+import { plural } from '@/lib/format';
 type DataState =
   | { kind: 'loading' }
   | { kind: 'empty'; error?: string }
@@ -61,7 +62,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         demo: false,
         homeNames: await loadHomeNames(file, false),
       });
-      toast(`Loaded ${file.orders.length.toLocaleString('en-GB')} orders`);
+      toast(`Loaded ${plural(file.orders.length, 'order')}`);
     } catch {
       toast.error(errorText);
     }

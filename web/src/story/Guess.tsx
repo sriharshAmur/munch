@@ -41,11 +41,12 @@ export function Guess({ orders, now }: { orders: Order[]; now: string }) {
           <strong>{clock(result.window.hour * 60)}</strong>, from <strong>{winner.name}</strong>.
         </p>
         <p className="section-lede">
-          {date(result.window.time, true)}, if the pattern holds. If not, {result.restaurants
-            .slice(1, 3)
-            .map((r) => r.name)
-            .join(' or ')}
-          .
+          {date(result.window.time, true)}, if the pattern holds.
+          {result.restaurants.length > 1 &&
+            ` If not, ${result.restaurants
+              .slice(1, 3)
+              .map((r) => r.name)
+              .join(' or ')}.`}
         </p>
       </div>
       <div className="guess-score">
@@ -61,7 +62,9 @@ export function Guess({ orders, now }: { orders: Order[]; now: string }) {
             />
           ))}
         </div>
-        {score ? (
+        {score?.tested === 0 ? (
+          <p>A few more orders, and there'll be past guesses to check this one against.</p>
+        ) : score ? (
           <p>
             Asked the same question before each of your last {score.tested} orders, this guess named the right place{' '}
             {score.top1} times, about {hits} in 10.{' '}

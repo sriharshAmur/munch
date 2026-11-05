@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Dialog } from 'radix-ui';
 import { AnimatePresence, motion, type Variants } from 'motion/react';
 import { Pause, Play, X } from 'lucide-react';
@@ -280,6 +280,15 @@ function Player({
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [held, setHeld] = useState(false);
+  const downAt = useRef(0);
+  // On the document, not the player: a click on a slide or a button that goes
+  // disabled leaves focus on the dialog itself, outside the player.
+  const keys = useRef((_: KeyboardEvent) => {});
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => keys.current(e);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
   useEffect(() => {
     setIndex(0);
     setPaused(false);
@@ -321,19 +330,16 @@ function Player({
     setIndex((i) => Math.max(0, Math.min(last, i + step)));
   };
   const running = !paused && !held && !reduced && index < last;
+  keys.current = (e) => {
+    if (e.key === 'ArrowRight') go(1);
+    else if (e.key === 'ArrowLeft') go(-1);
+    else if (e.key === ' ' && !(e.target instanceof HTMLButtonElement)) {
+      e.preventDefault();
+      setPaused((p) => !p);
+    }
+  };
   return (
-    <div
-      className="ys"
-      data-theme-stage={slide.theme}
-      onKeyDown={(e) => {
-        if (e.key === 'ArrowRight') go(1);
-        else if (e.key === 'ArrowLeft') go(-1);
-        else if (e.key === ' ' && !(e.target instanceof HTMLButtonElement)) {
-          e.preventDefault();
-          setPaused((p) => !p);
-        }
-      }}
-    >
+    <div className="ys" data-theme-stage={slide.theme}>
       <div className="ys-progress" aria-hidden="true">
         {deck.map((s, i) => (
           <span key={s.key}>
@@ -363,12 +369,17 @@ function Player({
       </div>
       <div
         className="ys-tap"
-        onPointerDown={() => setHeld(true)}
+        onPointerDown={() => {
+          downAt.current = Date.now();
+          setHeld(true);
+        }}
         onPointerUp={() => setHeld(false)}
         onPointerCancel={() => setHeld(false)}
         onPointerLeave={() => setHeld(false)}
         onClick={(e) => {
           if ((e.target as HTMLElement).closest('button, a')) return;
+          // Letting go after holding to pause is not a tap.
+          if (Date.now() - downAt.current > 300) return;
           const rect = e.currentTarget.getBoundingClientRect();
           go(e.clientX - rect.left < rect.width * 0.3 ? -1 : 1);
         }}
@@ -431,6 +442,7 @@ export function Stories({ history }: { history: Order[] }) {
   const [open, setOpen] = useState<Period | null>(null);
   const seen = useSeenStories(source);
   const reduced = useReducedMotion();
+  const opener = useRef<HTMLButtonElement | null>(null);
   if (!recaps.length) return null;
   const id = (r: Recap) => `${String(r.period)}:${r.count}`;
   const play = (p: Period) => {
@@ -455,14 +467,17 @@ export function Stories({ history }: { history: Order[] }) {
               className="story-ring"
               data-seen={seen.has(id(r))}
               data-kind={r.kind}
-              onClick={() => play(r.period)}
+              onClick={(e) => {
+                opener.current = e.currentTarget;
+                play(r.period);
+              }}
               aria-label={`Play ${r.kind === 'all' ? 'your year' : r.title}: ${plural(r.count, 'order')}${seen.has(id(r)) ? ', watched' : ''}`}
             >
               <span className="ring-face" data-theme-stage={r.kind === 'all' ? 'lamp' : themes[i % themes.length]}>
                 {r.kind === 'all' ? (
                   <>
                     <b>{r.count}</b>
-                    <small>orders</small>
+                    <small>{r.count === 1 ? 'order' : 'orders'}</small>
                   </>
                 ) : (
                   <b>{r.label.slice(0, 3)}</b>
@@ -477,7 +492,15 @@ export function Stories({ history }: { history: Order[] }) {
       <Dialog.Root open={open !== null} onOpenChange={(v) => !v && setOpen(null)}>
         <Dialog.Portal>
           <Dialog.Overlay className="ys-overlay" />
-          <Dialog.Content className="ys-content" aria-describedby={undefined}>
+          <Dialog.Content
+            className="ys-content"
+            aria-describedby={undefined}
+            // There is no Dialog.Trigger, so Radix has nothing to return focus to.
+            onCloseAutoFocus={(e) => {
+              e.preventDefault();
+              opener.current?.focus();
+            }}
+          >
             <Dialog.Title className="sr-only">{recaps[at]?.title ?? 'Your story'}</Dialog.Title>
             {open !== null && <Player history={history} period={open} next={next} onPeriod={play} onClose={() => setOpen(null)} />}
           </Dialog.Content>

@@ -1,3 +1,4 @@
+import { local } from '@core/analyze/shared';
 export const number = (n: number) =>
   new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 }).format(n);
 export const euros = (cents: number, whole = false) =>
@@ -57,7 +58,8 @@ export const day = (iso: string) =>
   );
 /** How long ago, in the words a person would use: "today", "3 weeks ago". */
 export function ago(iso: string, now: string) {
-  const days = Math.floor((Date.parse(now) - Date.parse(iso)) / 86400000);
+  // Calendar days in Amsterdam, so last night's 23:00 order is "yesterday" at breakfast.
+  const days = Math.round((Date.parse(local(now).date) - Date.parse(local(iso).date)) / 86400000);
   if (days <= 0) return 'today';
   if (days === 1) return 'yesterday';
   if (days < 14) return `${days} days ago`;
