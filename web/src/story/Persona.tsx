@@ -82,7 +82,7 @@ export function Persona({ orders, history }: { orders: Order[]; history: Order[]
                   initial={reduced ? false : { transform: 'scaleX(0)' }}
                   whileInView={{ transform: `scaleX(${Math.max(0.02, fill)})` }}
                   viewport={{ once: true, margin: '-15% 0px' }}
-                  transition={{ duration: 0.9, delay: i * 0.07, ease: [0.23, 1, 0.32, 1] }}
+                  transition={{ duration: 0.9, delay: i * 0.04, ease: [0.23, 1, 0.32, 1] }}
                   style={{ transform: reduced ? `scaleX(${Math.max(0.02, fill)})` : undefined }}
                 />
                 <b style={{ left: `${trait.strong * 100}%` }} title={`Strong from ${percent(trait.strong)}`} />

@@ -16,7 +16,7 @@ type Theme = 'night' | 'lamp' | 'violet' | 'leaf' | 'ember';
 type Slide = { key: string; theme: Theme; body: ReactNode };
 const themes: Theme[] = ['violet', 'lamp', 'leaf', 'ember', 'night'];
 
-const list: Variants = { show: { transition: { staggerChildren: 0.09, delayChildren: 0.12 } } };
+const list: Variants = { show: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } } };
 const item: Variants = {
   hide: { opacity: 0, transform: 'translateY(28px)' },
   show: { opacity: 1, transform: 'translateY(0px)', transition: { type: 'spring', duration: 0.7, bounce: 0.2 } },
@@ -47,7 +47,7 @@ function slides(r: Recap, reduced: boolean, actions: ReactNode): Slide[] {
                 key={i}
                 initial={reduced ? false : { transform: 'translateY(60%)', opacity: 0 }}
                 animate={{ transform: 'translateY(0%)', opacity: 1 }}
-                transition={{ type: 'spring', duration: 0.9, bounce: 0.25, delay: 0.15 + i * 0.05 }}
+                transition={{ type: 'spring', duration: 0.9, bounce: 0.25, delay: 0.08 + i * 0.03 }}
                 aria-hidden="true"
               >
                 {d === ' ' ? ' ' : d}
@@ -153,7 +153,7 @@ function slides(r: Recap, reduced: boolean, actions: ReactNode): Slide[] {
                 <motion.i
                   initial={reduced ? false : { transform: 'scaleY(0)' }}
                   animate={{ transform: `scaleY(${Math.max(0.03, b.count / max)})` }}
-                  transition={{ type: 'spring', duration: 0.8, bounce: 0.15, delay: 0.35 + i * 0.04 }}
+                  transition={{ type: 'spring', duration: 0.8, bounce: 0.15, delay: 0.15 + i * 0.03 }}
                 />
                 <span>{b.short}</span>
               </div>
@@ -460,7 +460,7 @@ export function Stories({ history }: { history: Order[] }) {
             key={String(r.period)}
             initial={reduced ? false : { opacity: 0, transform: 'scale(0.85)' }}
             animate={{ opacity: 1, transform: 'scale(1)' }}
-            transition={{ type: 'spring', duration: 0.5, bounce: 0.25, delay: Math.min(i, 10) * 0.035 }}
+            transition={{ type: 'spring', duration: 0.5, bounce: 0.25, delay: Math.min(i, 6) * 0.025 }}
           >
             <button
               type="button"

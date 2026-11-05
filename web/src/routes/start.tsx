@@ -1,49 +1,38 @@
-import { useEffect, useRef, useState } from 'react';
-import { OrdersFileSchema } from '@core/schema';
-import { noticed } from '@core/analyze/noticed';
+import { lazy, Suspense, useRef } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { useData } from '@/data/provider';
-import { tickets, TicketCard, type Ticket } from '@/story/Rail';
 
-const wanted = ['ritual', 'ghosted', 'inflation'];
+// The fanned-out tickets are decoration, so they load after the words they sit beside.
+const Preview = lazy(() => import('./start-preview').then((m) => ({ default: m.Preview })));
 
-/** Three of the made-up person's tickets, fanned out beside the invitation. */
-function Preview() {
-  const [list, setList] = useState<Ticket[]>([]);
-  useEffect(() => {
-    let live = true;
-    void fetch(`${import.meta.env.BASE_URL}demo/orders.json`)
-      .then((r) => r.json())
-      .then((v) => {
-        const file = OrdersFileSchema.parse(v);
-        const all = tickets(noticed(file.orders, file.generatedAt), file.orders, file.generatedAt, () => 'Home');
-        if (live) setList(wanted.flatMap((k) => all.filter((t) => t.key === k)));
-      })
-      .catch(() => {});
-    return () => {
-      live = false;
-    };
-  }, []);
-  return (
-    <div className="start-preview" aria-hidden="true" inert>
-      {list.map((t, i) => (
-        <div key={t.key} className="start-ticket" style={{ '--n': i } as React.CSSProperties}>
-          <TicketCard ticket={t} tilt={[-6, 3, -2][i] ?? 0} />
-        </div>
-      ))}
-    </div>
-  );
-}
 export function Start() {
   const { loadDemo, openFile, state } = useData(),
     navigate = useNavigate(),
     input = useRef<HTMLInputElement>(null);
   const base = import.meta.env.BASE_URL;
-  const shot = (name: string, alt: string) => (
+  // The wide shot is 1440 by 900, the others 1080 by 675: about twice the size they are shown at.
+  const shot = (name: string, alt: string, width = 1080, height = 675) => (
     <span className="tour-shot">
-      <img className="shot-light" src={`${base}img/${name}-light.jpg`} alt={alt} loading="lazy" />
-      <img className="shot-dark" src={`${base}img/${name}-dark.jpg`} alt="" aria-hidden="true" loading="lazy" />
+      <img
+        className="shot-light"
+        src={`${base}img/${name}-light.webp`}
+        alt={alt}
+        width={width}
+        height={height}
+        loading="lazy"
+        decoding="async"
+      />
+      <img
+        className="shot-dark"
+        src={`${base}img/${name}-dark.webp`}
+        alt=""
+        aria-hidden="true"
+        width={width}
+        height={height}
+        loading="lazy"
+        decoding="async"
+      />
     </span>
   );
   const demo = () => void loadDemo().then(() => navigate({ to: '/', search: {} }));
@@ -58,7 +47,9 @@ export function Start() {
       }}
     >
       <section className="start">
-        <Preview />
+        <Suspense fallback={<div className="start-preview" aria-hidden="true" />}>
+          <Preview />
+        </Suspense>
         <h1 className="text-display">
           There’s a story
           <br />
@@ -103,7 +94,7 @@ export function Start() {
         </h2>
         <div className="tour-grid">
           <figure className="tour-item tour-wide">
-            {shot('cards', 'Cards answering when you order and where from, with bar charts')}
+            {shot('cards', 'Cards answering when you order and where from, with bar charts', 1440, 900)}
             <figcaption>
               <strong>Plain answers.</strong> When you order, where from, how the year went week by week, what an order
               costs. Every bar opens the orders behind it.

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
-    "build:site": "rm -rf dist && MUNCH_BASE=/munch/ vite build --outDir ../dist/munch && cp dist/munch/index.html dist/index.html",
+    "build:site": "rm -rf dist && MUNCH_BASE=/munch/ vite build --outDir ../dist/munch && cp dist/munch/index.html dist/index.html && cp _headers dist/_headers",
     "deploy": "bun run build:site && bunx wrangler deploy",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p .",

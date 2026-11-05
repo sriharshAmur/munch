@@ -403,7 +403,7 @@ body footer:not([class]) {
   left: calc(var(--n) * 124px);
   width: 260px;
   filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--m-ink) 14%, transparent));
-  animation: deal 700ms var(--m-ease-out) calc(var(--n) * 120ms + 150ms) both;
+  animation: deal 700ms var(--m-ease-out) calc(var(--n) * 60ms) both;
 }
 @keyframes deal {
   from {

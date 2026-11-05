@@ -1,0 +1,4 @@
+# Copied to dist/_headers by build:site. Vite puts a content hash in every file name under assets/,
+# so those can be cached for good; everything else, index.html included, revalidates.
+/munch/assets/*
+  Cache-Control: public, max-age=31536000, immutable

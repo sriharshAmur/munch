@@ -58,7 +58,7 @@ export function Guess({ orders, now }: { orders: Order[]; now: string }) {
               initial={reduced ? false : { opacity: 0, transform: 'scale(0.6)' }}
               whileInView={{ opacity: 1, transform: 'scale(1)' }}
               viewport={{ once: true }}
-              transition={{ type: 'spring', duration: 0.5, bounce: 0.3, delay: i * 0.05 }}
+              transition={{ type: 'spring', duration: 0.5, bounce: 0.3, delay: i * 0.03 }}
             />
           ))}
         </div>

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   createRouter,
@@ -9,26 +10,34 @@ import {
 import { DataProvider, useData } from './data/provider';
 import { Shell } from './components/Shell';
 import { Start } from './routes/start';
-import { Home } from './home/Home';
-import { Orders } from './routes/orders';
-import { Places } from './routes/places';
 import { SearchSchema } from './lib/search';
 import { Toaster } from './components/ui/sonner';
 import { Skeleton } from './components/ui/skeleton';
 import { TooltipProvider } from './components/ui/tooltip';
 import './styles/app.css';
+// Each page is its own chunk, so the start page never downloads the charts, the table or the stories.
+const Home = lazy(() => import('./home/Home').then((m) => ({ default: m.Home })));
+const Orders = lazy(() => import('./routes/orders').then((m) => ({ default: m.Orders })));
+const Places = lazy(() => import('./routes/places').then((m) => ({ default: m.Places })));
+// A tab left open across a deploy asks for page chunks that are gone; reload once to get the new build.
+window.addEventListener('vite:preloadError', () => {
+  if (sessionStorage.getItem('munch-reloaded')) return;
+  sessionStorage.setItem('munch-reloaded', '1');
+  location.reload();
+});
 const rootRoute = createRootRoute({
   component: Shell,
   validateSearch: (input) => SearchSchema.parse(input),
 });
 function Ready({ children }: { children: React.ReactNode }) {
   const { state } = useData();
+  const wait = <Skeleton className="h-80 w-full" />;
   return state.kind === 'loading' ? (
-    <Skeleton className="h-80 w-full" />
+    wait
   ) : state.kind === 'empty' ? (
     <Navigate to="/start" />
   ) : (
-    children
+    <Suspense fallback={wait}>{children}</Suspense>
   );
 }
 const routes = [
